@@ -1,5 +1,4 @@
 from django.shortcuts import render
-from django.http import HttpResponse
 
 def base(request):
-    return HttpResponse('Hello world!')
+    return render(request, 'bexp/base.html', {'name': 'Mack'})
