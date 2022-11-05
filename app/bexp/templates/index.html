@@ -23,7 +23,9 @@
         <span id="tx_container_div"></span>
       </div>
       
-        {% block search %}{% endblock search %}
+        {% block search %}
+          {% include 'search.html' %}
+        {% endblock search %}
 
     </main>
 
