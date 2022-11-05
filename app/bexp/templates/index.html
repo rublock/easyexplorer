@@ -10,31 +10,22 @@
 
 <body>
   <div class="main_page">
-    <!-- HEADER -->
-    <header class="container-fluid p-0" id="header_div">
-      <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-          <a href="index.html" id="logo"></a>
-          <a class="navbar-brand" href="index.html">&nbsp bitTracker.io</a>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-            data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
-            aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-              <!-- ENTER CODE FOR BUTTONS -->
-            </ul>
 
-            <div id="headerSearch">
-              <!-- HEADER SEARCH -->
-            </div>
-          </div>
-        </div>
-      </nav>
-    </header>
+    <!-- CONTENT MODULE -->
+    <main class="main_container">
 
-   {{ name }}
+        {% block header %}{% endblock header %}
+
+      <!-- DATA -->
+      <div class="container" id="data_container">
+        <span id="address_container_div"></span>
+        <span id="not_found"></span>
+        <span id="tx_container_div"></span>
+      </div>
+      
+        {% block search %}{% endblock search %}
+
+    </main>
 
     <!-- FOOTER -->
     <footer class="footer">
