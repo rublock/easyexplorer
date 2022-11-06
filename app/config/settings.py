@@ -69,6 +69,15 @@ TEMPLATES = [
     },
 ]
 
+# Static files (CSS, JavaScript, Images)
+STATIC_URL = "/static/"
+# STATIC_ROOT = BASE_DIR / 'static'  # python manage.py collectstatic
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),
+]
+
+print(f'базовая директория: {BASE_DIR}')
+
 WSGI_APPLICATION = 'config.wsgi.application'
 
 
