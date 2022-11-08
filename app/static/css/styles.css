@@ -8,6 +8,12 @@
     border: 1px solid red
 }
 
+.logo {
+    width: 38px;
+    height: 38px;
+    margin-right: 5px;
+}
+
 /* ДАТА ТРАНЗАКЦИИ */
 .tx_date {
     /* display: inline;
