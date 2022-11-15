@@ -1,15 +1,10 @@
 {% load static %}
 <!-- SEARCH -->
-<div id="search_field" class="searchField">
+<div class="searchField">
   <div class="container">
-    <form class="d-flex" id="form" onsubmit="return false">
-      <input class="form-control me-2" type="search" placeholder="Enter Bitcoin address" aria-label="Search"
-        id="userInput" />
-      <button class="btn btn-outline-success" type="submit" id="searchButton">
-        Search
-      </button>
+    <form class="d-flex" action="address">
+      <input class="form-control me-2" type="search" placeholder="Enter Bitcoin address" name="address" />
+      <button class="btn btn-outline-success" type="submit">Search</button>
     </form>
   </div>
 </div>
-
-<div id="search_error"></div>
