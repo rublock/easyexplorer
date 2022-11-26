@@ -1,8 +1,23 @@
+{% extends 'index.html' %}
 {% load static %}
+
+{% block main %}
+<!-- CONTENT MODULE -->
+<main class="main_container">
+
 <!-- DATA -->
-<h1>{{ data }}</h1>
-<div class="container" id="data_container">
-    <span id="address_container_div"></span>
-    <span id="not_found"></span>
-    <span id="tx_container_div"></span>
-  </div>
+<div class="container mt-3" id="table-body">
+    {% for i in txrefs_assembler %}
+        {% if i.tx_input_n > 0 %}
+        <div class="alert alert-light" style="box-shadow: 0 0 5px rgba(0,0,0,0.5);">
+            <span class="tx_date">{{ i.confirmed }}</span>
+            <span id="tx_ammount" class="tx_ammount">{{ i.value }}</span>
+            <span id="tx_hash" class="tx_hash"><a href="#" class="hash_link">{{ i.tx_hash }}</a></span>
+          </div>
+
+        {% endif %}
+    {% endfor %}
+</div>
+
+</main>
+{% endblock %}
