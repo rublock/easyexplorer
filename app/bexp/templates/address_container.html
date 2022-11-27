@@ -5,19 +5,16 @@
 <!-- CONTENT MODULE -->
 <main class="main_container">
 
-<!-- DATA -->
-<div class="container mt-3" id="table-body">
-    {% for i in txrefs_assembler %}
-        {% if i.tx_input_n > 0 %}
+    <!-- DATA -->
+    <div class="container mt-3" id="table-body">
+        {% for key, value in data.items %}
         <div class="alert alert-light" style="box-shadow: 0 0 5px rgba(0,0,0,0.5);">
-            <span class="tx_date">{{ i.confirmed }}</span>
-            <span id="tx_ammount" class="tx_ammount">{{ i.value }}</span>
-            <span id="tx_hash" class="tx_hash"><a href="#" class="hash_link">{{ i.tx_hash }}</a></span>
-          </div>
-
-        {% endif %}
-    {% endfor %}
-</div>
+            <span class="tx_date">{{ value.0 }}</span>
+            <span id="tx_ammount" class="tx_ammount">{{ value.2 }}</span>
+            <span id="tx_hash" class="tx_hash"><a href="#" class="hash_link">{{ value.1 }}</a></span>
+        </div>
+        {% endfor %}
+    </div>
 
 </main>
 {% endblock %}
