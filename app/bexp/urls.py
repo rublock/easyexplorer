@@ -4,5 +4,5 @@ from django.contrib import admin
 
 urlpatterns = [
     path('', base),
-    path('address', address),
+    path('address/', address),
 ]
