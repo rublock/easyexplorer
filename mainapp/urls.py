@@ -7,5 +7,5 @@ app_name = MainappConfig.name
 
 urlpatterns = [
     path("", views.MainPageView.as_view()),
-    path("address/", views.MainPageView.address, name="address"),
+    path("address/", views.address, name="address"),
 ]

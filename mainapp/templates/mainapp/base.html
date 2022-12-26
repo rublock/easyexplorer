@@ -37,10 +37,20 @@
         </div>
       </nav>
     </header>
-    
-    {{ data.0 }}
 
-    {% block content %}{% endblock content %}
+    <main class="main_container">
+      {% block content %}
+        <!-- SEARCH -->
+        <div class="searchField">
+          <div class="container">
+            <form class="d-flex" action="address">
+              <input class="form-control me-2" type="search" placeholder="Enter Bitcoin address" name="address" />
+              <button class="btn btn-outline-success" type="submit">Search</button>
+            </form>
+          </div>
+        </div>
+      {% endblock %}
+    </main>
 
     <!-- FOOTER -->
     <footer class="footer">
