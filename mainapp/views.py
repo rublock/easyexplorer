@@ -8,7 +8,7 @@ class MainPageView(TemplateView):
 
 
 def address(request):
-    address_details = get_address_details(request.GET.get('address'))
+    address_details = get_address_details(request.GET.get('address'), txn_limit=2000)
     temp_list = []
     temp_array = []
     data = {}
