@@ -98,6 +98,7 @@
 .qr_code {
     width: 150px;
     height: 150px;
+    border-color: #000000;
 }
 
 /* Балланс */

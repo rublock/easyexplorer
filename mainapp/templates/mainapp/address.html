@@ -1,14 +1,52 @@
 {% extends 'mainapp/base.html' %}
 
 {% block content %}
-    <!-- DATA -->
-    <div class="container mt-3" id="table-body">
-        {% for key, value in data.items %}
-        <div class="alert alert-light" style="box-shadow: 0 0 5px rgba(0,0,0,0.5);">
-            <span class="tx_date">{{ value.0 }}</span>
-            <span id="tx_ammount" class="tx_ammount">{{ value.2 }}</span>
-            <span id="tx_hash" class="tx_hash"><a href="#" class="hash_link">{{ value.1 }}</a></span>
+    <!-- ADDRESS DATA -->
+    <div class="container" id="data_container">
+        <div class="container mt-3" id="address_container_div_mt-3">
+            <div class="alert alert-light" id="address_container">
+                <div class="first_block">
+                    <canvas id="qr_code"></canvas>
+                </div>
+                <div class="second_block">
+                    <div class="address_container">
+                        <div class="copyContainer">
+                            <span class="far fa-copy"></span>
+                        </div>
+                        <div>
+                            <span id="user_address"></span>
+                        </div>
+                    </div>
+                    <div class="balance_container">
+                        <div class="curr">
+                            <i class="fa-solid fa-dollar-sign"></i>
+                            <i class="fa-solid fa-bitcoin-sign"></i>
+                        </div>
+                        <div class="balance">
+                            <div">balance</div>
+                                <div id="balance"></div>
+                                    </div>
+                                    <div class="transactions_container">
+                                        <div>
+                                            <span class="numTx">transactions <b id="number_of_tx"></b></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- TX DATA -->
+                    <div class="container mt-3" id="table-body">
+                        {% for key, value in data.items %}
+                            <div class="alert alert-light" style="box-shadow: 0 0 5px rgba(0,0,0,0.5);">
+                                <span class="tx_date">{{ value.0 }}</span>
+                                <span id="tx_ammount" class="tx_ammount">{{ value.2 }}</span>
+                                <span id="tx_hash" class="tx_hash"><a href="#" class="hash_link">{{ value.1 }}</a></span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
         </div>
-        {% endfor %}
     </div>
 {% endblock %}
