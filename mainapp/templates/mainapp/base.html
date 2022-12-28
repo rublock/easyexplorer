@@ -1,4 +1,5 @@
 {% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -18,8 +19,8 @@
       <header class="container-fluid p-0" id="header_div">
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
           <div class="container-fluid">
-            <img class="logo" src="{% static 'img/logo.png' %}" alt="logo">
-            <a class="navbar-brand" href="">btcblockexplorer.io</a>
+            <a href="{% url 'mainapp:home' %}"><img class="logo" src="{% static 'img/logo.png' %}" alt="logo"></a>
+            <a class="navbar-brand" href="{% url 'mainapp:home' %}">btcblockexplorer.io</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
               data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
               aria-label="Toggle navigation">

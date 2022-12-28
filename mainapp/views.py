@@ -13,6 +13,7 @@ def address(request):
     temp_array = []
     data = {}
     count = 0
+    balance = address_details['balance'] / 100000000
 
     for i in address_details['txrefs']:
         if i['tx_hash'] in temp_list:
@@ -38,4 +39,4 @@ def address(request):
             ]
             count += 1
 
-    return render(request, 'mainapp/address.html', {'data': data})
+    return render(request, 'mainapp/address.html', {'address_details': address_details,'balance': balance, 'data': data})

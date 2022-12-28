@@ -14,7 +14,7 @@
                             <span class="far fa-copy"></span>
                         </div>
                         <div>
-                            <span id="user_address"></span>
+                            <span id="user_address">{{ address_details.address }}</span>
                         </div>
                     </div>
                     <div class="balance_container">
@@ -23,12 +23,12 @@
                             <i class="fa-solid fa-bitcoin-sign"></i>
                         </div>
                         <div class="balance">
-                            <div">balance</div>
-                                <div id="balance"></div>
+                            <div">BTC balance</div>
+                                <div id="balance"><span>{{ balance }}</span></div>
                                     </div>
                                     <div class="transactions_container">
                                         <div>
-                                            <span class="numTx">transactions <b id="number_of_tx"></b></span>
+                                            <span class="numTx">transactions <b id="number_of_tx">{{ address_details.n_tx }}</b></span>
                                         </div>
                                     </div>
                                 </div>
