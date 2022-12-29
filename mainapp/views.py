@@ -1,6 +1,7 @@
 from blockcypher import get_address_details
 from django.shortcuts import render
 from django.views.generic import TemplateView
+import qrcode
 
 
 class MainPageView(TemplateView):
@@ -14,6 +15,9 @@ def address(request):
     data = {}
     count = 0
     balance = address_details['balance'] / 100000000
+
+    qr_img = qrcode.make(address_details['address'])
+    qr_img.save("static/img/qr.png")
 
     for i in address_details['txrefs']:
         if i['tx_hash'] in temp_list:

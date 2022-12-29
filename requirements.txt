@@ -1,2 +1,4 @@
 Django==4.1.1
 blockcypher==1.0.93
+Pillow==9.2.0
+qrcode==7.3.1
