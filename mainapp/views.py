@@ -16,8 +16,15 @@ def address(request):
     count = 0
     balance = address_details['balance'] / 100000000
 
-    qr_img = qrcode.make(address_details['address'])
-    qr_img.save("static/img/qr.png")
+    qr = qrcode.QRCode(
+        box_size=10,
+        border=6,
+    )
+    qr.add_data(address_details['address'])
+
+    img = qr.make_image(fill_color="#F7931A", back_color="white")
+
+    img.save("static/img/qr.png")
 
     for i in address_details['txrefs']:
         if i['tx_hash'] in temp_list:

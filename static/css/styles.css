@@ -1,28 +1,24 @@
-* {
-    margin: 0;
-    padding: 0;
-}
+body::-webkit-scrollbar {
+    width: 0.5em;
+  }
+   
+  body::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  }
+   
+  body::-webkit-scrollbar-thumb {
+    background-color: #F7931A;
+    outline: 1px solid slategrey;
+  }
 
-/* for new containers */
-.set_border {
-    border: 1px solid red
-}
-
+/* LOGO */
 .logo {
     width: 38px;
     height: 38px;
     margin-right: 5px;
 }
 
-/* ДАТА ТРАНЗАКЦИИ */
-.tx_date {
-    /* display: inline;
-    float: left;
-    text-align: left; */
-    color: #000000;
-}
-
-/* СУММА ТРАНЗАКЦИИ */
+/* TX Ammount */
 .tx_ammount {
     display: inline;
     float: right;
@@ -30,7 +26,7 @@
     color: #000000;
 }
 
-/* СУММА ТРАНЗАКЦИИ ЕСЛИ МИНУС */
+/* TX ammount minus */
 .tx_ammount_minus {
     display: inline;
     float: right;
@@ -38,88 +34,82 @@
     color: red;
 }
 
-/* ХЭШ ТРАНЗАКЦИИ */
-.tx_hash {
-    display: inline-block;
-    text-align: center;
-    margin: auto 1%;
-}
-
-/* ЦВЕТ ССЫЛКИ НА ХЭШ ДО НАВЕДЕНИЯ */
+/* Hash url */
 .hash_link {
     color: #000000;
     overflow-wrap: anywhere;
-    /* делает длинный хэш адаптивным */
 }
 
-/* ЦВЕТ ССЫЛКИ НА ХЭШ ПОСЛЕ НАВЕДЕНИЯ */
+/* Hash url hover */
 .hash_link:hover {
-    color: #0d6efd;
+    color: #120edb;
 }
 
-/* БЛОК ДАННЫХ ОБ АДРЕСЕ */
-#address_container {
+/* Address block */
+.address_container {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
     height: 100%;
     display: flex;
     justify-content: space-between;
 }
 
-.first_block {
-    display: flex;
-}
-
-.second_block {
+.address_block {
     display: flex;
     align-items: flex-end;
     flex-direction: column;
 }
 
-.address_container {
-    display: flex;
-    flex-direction: row;
-    color: #000000;
-}
-
-.balance_container {
+.balance_block {
     display: flex;
     flex-direction: row;
     color: #000000;
     flex-flow: row wrap;
 }
 
-.transactions_container {
+.balance {
+    color: green; 
+    font-weight: bold; 
+    margin-left: 4px;
+}
+
+.transactionsBlock {
     display: flex;
     align-items: flex-end;
-    margin-top: 92px;
+    margin-top: 65px;
 }
+
+@media (max-width:450px) {
+    .balance {
+      margin-left: 0px;
+    }
+    .balanceText {
+        margin-top: 16.5px;
+    }
+    .transactionsBlock {
+        margin-top: 16.5px;
+    }
+    .address_container {
+        padding-left: 0px;  
+    }
+}
+
+
 
 /* QRCode */
 .qrImg {
-    width: 164px;
-    height: 164px;
+    width: 137px;
+    height: 137px;
 }
 
-/* Балланс */
-.balance {
-    display: flex;
-    flex-direction: row;
-    margin-left: 4px;
-    margin-right: 4px;
-}
 
-#balance {
-    color: green;
-    font-weight: bold;
-}
 
-/* Количество транзакций */
-.numTx {
-    color: #000000;
-    margin-top: auto;
-}
 
-/* ПАГИНАЦИЯ */
+
+
+
+
+
+/* Pagination */
 .pagination_wrapper {
     display: inline-flex;
     justify-content: center;
@@ -141,39 +131,6 @@
     padding: 5px 0;
 }
 
-.container_home_page {
-    display: grid;
-    grid-auto-flow: row dense;
-    grid-auto-columns: 50%;
-    gap: 0px 0px;
-}
-
-/* БЛОК ДАННЫХ ОБ АДРЕСЕ */
-#price_container {
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-    margin-left: auto;
-    width: 100%;
-    padding: 0;
-    height: 545px;
-}
-
-.fa-copy {
-    white-space: nowrap;
-    cursor: pointer;
-}
-
-.fa-copy:hover {
-    white-space: nowrap;
-    cursor: pointer;
-    color: #0d6efd;
-}
-
-#user_address {
-    overflow-wrap: anywhere;
-    margin-left: 4px;
-}
-
-/* ОБЩИЙ КОНТЕЙНЕР ДЛЯ ВСЕГО */
 .main_page {
     overflow: hidden;
     display: flex;
@@ -181,16 +138,10 @@
     min-height: 100vh;
 }
 
-/* КОНТЕЙНЕР ДЛЯ КОНТЕНТА */
+
 .main_container {
-    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    margin-top: auto;
     margin-bottom: auto;
-}
-
-#address_container_div_mt-3 {
-    padding: 0;
-}
-
-.searchField {
-    margin-top: 250px;
 }
