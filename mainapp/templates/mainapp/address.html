@@ -1,53 +1,126 @@
-{% extends 'mainapp/base.html' %}
-
 {% load static %}
 
-{% block content %}
-<!-- ADDRESS DATA -->
-<div class="container" id="data_container">
-    <div class="container mt-3" id="address_container_div_mt-3" style="padding: 0;">
-        <div class="alert alert-light address_container">
-            <div>
-                <img src="{% static 'img/qr.png' %}" class="qrImg">
+{% load humanize %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>btcblockexplorer.io</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}" type="text/css" media="screen">
+</head>
+
+<body>
+    <div class="main_page">
+        <!-- HEADER -->
+        <header class="container-fluid p-0" id="header_div">
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+                <div class="container-fluid">
+                    <a href="{% url 'mainapp:home' %}"><img class="logo" src="{% static 'img/logo.png' %}"
+                            alt="logo"></a>
+                    <a class="navbar-brand" href="{% url 'mainapp:home' %}">btcblockexplorer.io</a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                            <!-- ENTER CODE FOR BUTTONS -->
+                        </ul>
+                        <!-- SEARCH -->
+                        <div>
+                            <div class="container headerSearch">
+                                <form class="d-flex">
+                                    <input class="form-control me-2" type="search" placeholder="Enter Bitcoin address" name="address" />
+                                    <button class="btn btn-outline-success" type="submit">Search</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </header>
+            <!-- ADDRESS DATA -->
+            <div class="container" id="data_container">
+                <div class="container mt-3" id="address_container_div_mt-3" style="padding: 0;">
+                    <div class="alert alert-light address_container">
+                        <div>
+                            <img src="{% static 'img/qr.png' %}" class="qrImg">
+                        </div>
+                        <div class="address_block">
+                            <div style="color:black">
+                                <div class="copyContainer">
+                                    <span class="far fa-copy"></span>
+                                </div>
+                                <div>
+                                    <span style="overflow-wrap: anywhere;">{{ address_details.address }}</span>
+                                </div>
+                            </div>
+                            <div class="balance_block">
+                                <div class="curr">
+                                    <i class="fa-solid fa-dollar-sign"></i>
+                                    <i class="fa-solid fa-bitcoin-sign"></i>
+                                </div>
+                                <div class="balanceText">BTC balance</div>
+                                <div><span class="balance">{{ balance }}</span></div>
+                            </div>
+                            <div class="transactionsBlock">
+                                <div>
+                                    <span style="color:black">transactions <b id="number_of_tx">{{ address_details.n_tx }}</b></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="address_block">
-                <div style="color:black">
-                    <div class="copyContainer">
-                        <span class="far fa-copy"></span>
-                    </div>
-                    <div>
-                        <span style="overflow-wrap: anywhere;">{{ address_details.address }}</span>
-                    </div>
+
+            <!-- TX DATA -->
+            <div class="container mt-3" id="table-body">
+                {% for key, value in data.items %}
+                <div class="alert alert-light" style="box-shadow: 0 0 5px rgba(0,0,0,0.5);">
+                    <span style="color:black; margin-right: 8px;">{{ value.0 }}</span>
+                    {% if value.2 < 0 %}
+                        <span class="tx_ammount_minus">{{ value.2|floatformat:8|intcomma }}</span>
+                    {% else %}
+                        <span class="tx_ammount">{{ value.2|floatformat:8|intcomma }}</span>
+                    {% endif %}
+                    <span id="tx_hash"><a href="#" class="hash_link">{{ value.1 }}</a></span>
                 </div>
-                <div class="balance_block">
-                    <div class="curr">
-                        <i class="fa-solid fa-dollar-sign"></i>
-                        <i class="fa-solid fa-bitcoin-sign"></i>
-                    </div>
-                    <div class="balanceText">BTC balance</div>  
-                    <div><span class="balance">{{ balance }}</span></div>
-                </div>
-                <div class="transactionsBlock">
-                    <div>
-                        <span style="color:black">transactions <b id="number_of_tx">{{ address_details.n_tx }}</b></span>
-                    </div>
-                </div>
+                {% endfor %}
             </div>
-        </div>
+        <!-- FOOTER -->
+        <footer class="footer">
+            <ul class="nav justify-content-center border-bottom pb-3 mb-3">
+                <li class="nav-item">
+                    <a href="#" class="nav-link px-2 text-muted">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link px-2 text-muted">Features</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link px-2 text-muted">Pricing</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link px-2 text-muted">FAQs</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link px-2 text-muted">About</a>
+                </li>
+            </ul>
+            <p class="text-center text-muted">© 2021 btcblockexplorer, Inc</p>
+        </footer>
     </div>
-</div>
-<!-- TX DATA -->
-<div class="container mt-3" id="table-body">
-    {% for key, value in data.items %}
-    <div class="alert alert-light" style="box-shadow: 0 0 5px rgba(0,0,0,0.5);">
-        <span style="color:black; margin-right: 8px;">{{ value.0 }}</span>
-        <span id="tx_ammount" class="tx_ammount">{{ value.2 }}</span>
-        <span id="tx_hash"><a href="#" class="hash_link">{{ value.1 }}</a></span>
-    </div>
-    {% endfor %}
-</div>
-</div>
-</div>
-</div>
-</div>
-{% endblock %}
+</body>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+    crossorigin="anonymous"></script>
+<script src="{% static 'js/app.js' %}"></script>
+
+</html>

@@ -1,15 +1,11 @@
 body::-webkit-scrollbar {
     width: 0.5em;
-  }
-   
-  body::-webkit-scrollbar-track {
-    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
-  }
-   
-  body::-webkit-scrollbar-thumb {
+}
+
+body::-webkit-scrollbar-thumb {
     background-color: #F7931A;
-    outline: 1px solid slategrey;
-  }
+    outline: 1px solid #008000;
+}
 
 /* LOGO */
 .logo {
@@ -67,8 +63,8 @@ body::-webkit-scrollbar {
 }
 
 .balance {
-    color: green; 
-    font-weight: bold; 
+    color: green;
+    font-weight: bold;
     margin-left: 4px;
 }
 
@@ -78,36 +74,39 @@ body::-webkit-scrollbar {
     margin-top: 65px;
 }
 
-@media (max-width:450px) {
-    .balance {
-      margin-left: 0px;
-    }
-    .balanceText {
-        margin-top: 16.5px;
-    }
-    .transactionsBlock {
-        margin-top: 16.5px;
-    }
-    .address_container {
-        padding-left: 0px;  
+.headerSearch {
+    width: 500px;
+}
+
+@media (max-width:991px) {
+    .headerSearch {
+        width: auto;
     }
 }
 
+@media (max-width:450px) {
+    .balance {
+        margin-left: 0px;
+    }
 
+    .balanceText {
+        margin-top: 16.5px;
+    }
+
+    .transactionsBlock {
+        margin-top: 16.5px;
+    }
+
+    .address_container {
+        padding-left: 0px;
+    }
+}
 
 /* QRCode */
 .qrImg {
     width: 137px;
     height: 137px;
 }
-
-
-
-
-
-
-
-
 
 /* Pagination */
 .pagination_wrapper {
@@ -137,7 +136,6 @@ body::-webkit-scrollbar {
     flex-direction: column;
     min-height: 100vh;
 }
-
 
 .main_container {
     display: flex;

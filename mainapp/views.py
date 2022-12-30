@@ -39,14 +39,14 @@ def address(request):
             data[count] = [
                 (i['confirmed'].strftime("%d.%m.%Y %H:%M")),
                 (i['tx_hash']),
-                ('{:.8f}'.format(minus_value / 100000000))
+                (minus_value / 100000000)
             ]
             count += 1
         else:
             data[count] = [
                 (i['confirmed'].strftime("%d.%m.%Y %H:%M")),
                 (i['tx_hash']),
-                ('{:.8f}'.format(i['value'] / 100000000))
+                (i['value'] / 100000000)
             ]
             count += 1
 
