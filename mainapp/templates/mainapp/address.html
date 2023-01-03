@@ -17,6 +17,7 @@
 
 <body>
     <div class="main_page">
+
         <!-- HEADER -->
         <header class="container-fluid p-0" id="header_div">
             <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -33,6 +34,7 @@
                         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                             <!-- ENTER CODE FOR BUTTONS -->
                         </ul>
+
                         <!-- SEARCH -->
                         <div>
                             <div class="container headerSearch">
@@ -46,6 +48,7 @@
                 </div>
             </nav>
         </header>
+
             <!-- ADDRESS DATA -->
             <div class="container" id="data_container">
                 <div class="container mt-3" id="address_container_div_mt-3" style="padding: 0;">
@@ -80,6 +83,23 @@
                 </div>
             </div>
 
+            <!-- PAGINATION -->
+            <div class="pagination_container">
+                <div id="pagination_wrapper" class="pagination_wrapper">
+                    
+
+                    <button class="page page-link" style="border-radius: 4px 0 0 4px; border: 0; color: #000000">&#171;</button>
+                    
+                    {% for i in pag_list %}
+                    <button class="page page-link" style="border-radius: 0px; border: 0; color: #000000">{{ i }}</button>
+                    {% endfor %}
+
+                    <button class="page page-link" style="border-radius: 0 4px 4px 0; border: 0; color: #000000">&#187;</button>
+
+
+                </div>
+              </div>
+
             <!-- TX DATA -->
             <div class="container mt-3" id="table-body">
                 {% for key, value in data.items %}
@@ -94,6 +114,7 @@
                 </div>
                 {% endfor %}
             </div>
+
         <!-- FOOTER -->
         <footer class="footer">
             <ul class="nav justify-content-center border-bottom pb-3 mb-3">

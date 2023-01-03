@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.views.generic import TemplateView
 import qrcode
 from django.views import View
+from django.core.paginator import Paginator
 
 
 class MainPageView(TemplateView):
@@ -17,6 +18,7 @@ class AddressView(View):
         data = {}
         count = 0
         balance = address_details['balance'] / 100000000
+
 
         qr = qrcode.QRCode(
             box_size=10,
@@ -52,5 +54,7 @@ class AddressView(View):
                 ]
                 count += 1
 
+        pag = Paginator(data, 10)
+        pag_list = [*range(pag.num_pages)]
 
-        return render(request, 'mainapp/address.html', {'address_details': address_details,'balance': balance, 'data': data})
+        return render(request, 'mainapp/address.html', {'address_details': address_details,'balance': balance, 'data': data, 'pag_list': pag_list})
