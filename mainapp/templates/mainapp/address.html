@@ -89,11 +89,9 @@
                     
 
                     <button class="page page-link" style="border-radius: 4px 0 0 4px; border: 0; color: #000000">&#171;</button>
-                    
                     {% for i in pag_list %}
                     <button class="page page-link" style="border-radius: 0px; border: 0; color: #000000">{{ i }}</button>
                     {% endfor %}
-
                     <button class="page page-link" style="border-radius: 0 4px 4px 0; border: 0; color: #000000">&#187;</button>
 
 
@@ -102,15 +100,15 @@
 
             <!-- TX DATA -->
             <div class="container mt-3" id="table-body">
-                {% for key, value in data.items %}
+                {% for k, v in pag_object.items %}
                 <div class="alert alert-light" style="box-shadow: 0 0 5px rgba(0,0,0,0.5);">
-                    <span style="color:black; margin-right: 8px;">{{ value.0 }}</span>
-                    {% if value.2 < 0 %}
-                        <span class="tx_ammount_minus">{{ value.2|floatformat:8|intcomma }}</span>
+                    <span style="color:black; margin-right: 8px;">{{ v.0 }}</span>
+                    {% if v.2 < 0 %}
+                        <span class="tx_ammount_minus">{{ v.2|floatformat:8|intcomma }}</span>
                     {% else %}
-                        <span class="tx_ammount">{{ value.2|floatformat:8|intcomma }}</span>
+                        <span class="tx_ammount">{{ v.2|floatformat:8|intcomma }}</span>
                     {% endif %}
-                    <span id="tx_hash"><a href="#" class="hash_link">{{ value.1 }}</a></span>
+                    <span id="tx_hash"><a href="#" class="hash_link">{{ v.1 }}</a></span>
                 </div>
                 {% endfor %}
             </div>

@@ -9,52 +9,65 @@ from django.core.paginator import Paginator
 class MainPageView(TemplateView):
     template_name = "mainapp/base.html"
 
-class AddressView(View):
 
+class AddressView(View):
     def get(self, request):
-        address_details = get_address_details(request.GET.get('address'), txn_limit=9999)
+        address_details = get_address_details(
+            request.GET.get("address"), txn_limit=9999
+        )
         temp_list = []
         temp_array = []
-        data = {}
+        tx_data = {}
         count = 0
-        balance = address_details['balance'] / 100000000
-
+        balance = address_details["balance"] / 100000000
 
         qr = qrcode.QRCode(
             box_size=10,
             border=6,
         )
-        qr.add_data(address_details['address'])
+        qr.add_data(address_details["address"])
 
         img = qr.make_image(fill_color="#F7931A", back_color="white")
 
         img.save("static/img/qr.png")
 
-        for i in address_details['txrefs']:
-            if i['tx_hash'] in temp_list:
-                temp_array[temp_list.index(i['tx_hash'])]['value'] += i['value']
+        for i in address_details["txrefs"]:
+            if i["tx_hash"] in temp_list:
+                temp_array[temp_list.index(i["tx_hash"])]["value"] += i["value"]
             else:
-                temp_list.append(i['tx_hash'])
+                temp_list.append(i["tx_hash"])
                 temp_array.append(i)
 
         for i in temp_array:
-            if i['tx_input_n'] > 0:
-                minus_value = 0 - i['value']
-                data[count] = [
-                    (i['confirmed'].strftime("%d.%m.%Y %H:%M")),
-                    (i['tx_hash']),
-                    (minus_value / 100000000)
+            if i["tx_input_n"] > 0:
+                minus_value = 0 - i["value"]
+                tx_data[count] = [
+                    (i["confirmed"].strftime("%d.%m.%Y %H:%M")),
+                    (i["tx_hash"]),
+                    (minus_value / 100000000),
                 ]
                 count += 1
             else:
-                data[count] = [
-                    (i['confirmed'].strftime("%d.%m.%Y %H:%M")),
-                    (i['tx_hash']),
-                    (i['value'] / 100000000)
+                tx_data[count] = [
+                    (i["confirmed"].strftime("%d.%m.%Y %H:%M")),
+                    (i["tx_hash"]),
+                    (i["value"] / 100000000),
                 ]
                 count += 1
 
-        pag = Paginator(data, 10)
-        pag_list = [*range(pag.num_pages)]
+        pag = Paginator(tx_data, 10)
+        pag_pages = [*range(pag.num_pages)]
 
-        return render(request, 'mainapp/address.html', {'address_details': address_details,'balance': balance, 'data': data, 'pag_list': pag_list})
+        pag_object = pag.object_list
+
+        return render(
+            request,
+            "mainapp/address.html",
+            {
+                "address_details": address_details,
+                "balance": balance,
+                "tx_data": tx_data,
+                "pag_list": pag_pages,
+                "pag_object": pag_object,
+            },
+        )
