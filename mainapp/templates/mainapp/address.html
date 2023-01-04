@@ -2,6 +2,8 @@
 
 {% load humanize %}
 
+{% load mathfilters %}
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -88,11 +90,13 @@
                 <div id="pagination_wrapper" class="pagination_wrapper">
                     
 
-                    <button class="page page-link" style="border-radius: 4px 0 0 4px; border: 0; color: #000000">&#171;</button>
+                    <a class="page page-link" style="border-radius: 4px 0 0 4px; border: 0; color: #000000">&#171;</a>
                     {% for i in pag_list %}
-                    <button class="page page-link" style="border-radius: 0px; border: 0; color: #000000">{{ i }}</button>
+                    
+                    <a href="?address={{ address_details.address }}&page={{ i|add:1 }}" class="page page-link" style="border-radius: 0px; border: 0; color: #000000">{{ i|add:1 }}</a>
+                        
                     {% endfor %}
-                    <button class="page page-link" style="border-radius: 0 4px 4px 0; border: 0; color: #000000">&#187;</button>
+                    <a class="page page-link" style="border-radius: 0 4px 4px 0; border: 0; color: #000000">&#187;</a>
 
 
                 </div>
