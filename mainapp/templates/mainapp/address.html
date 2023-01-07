@@ -85,36 +85,26 @@
                 </div>
             </div>
 
-            <!-- PAGINATION -->
-            <div class="pagination_container">
-                <div id="pagination_wrapper" class="pagination_wrapper">
-                    
+            {% for i in page_obj %}
+                {{ i }}
+            {% endfor %}
 
-                    <a class="page page-link" style="border-radius: 4px 0 0 4px; border: 0; color: #000000">&#171;</a>
-                    {% for i in pag_list %}
-                    
-                    <a href="?address={{ address_details.address }}&page={{ i|add:1 }}" class="page page-link" style="border-radius: 0px; border: 0; color: #000000">{{ i|add:1 }}</a>
-                        
-                    {% endfor %}
-                    <a class="page page-link" style="border-radius: 0 4px 4px 0; border: 0; color: #000000">&#187;</a>
-
-
-                </div>
-              </div>
-
-            <!-- TX DATA -->
-            <div class="container mt-3" id="table-body">
-                {% for k, v in pag_object.items %}
-                <div class="alert alert-light" style="box-shadow: 0 0 5px rgba(0,0,0,0.5);">
-                    <span style="color:black; margin-right: 8px;">{{ v.0 }}</span>
-                    {% if v.2 < 0 %}
-                        <span class="tx_ammount_minus">{{ v.2|floatformat:8|intcomma }}</span>
-                    {% else %}
-                        <span class="tx_ammount">{{ v.2|floatformat:8|intcomma }}</span>
+            <div class="pagination">
+                <span class="step-links">
+                    {% if page_obj.has_previous %}
+                        <a href="?page=1">&laquo; first</a>
+                        <a href="?address={{ address_details.address }}&page={{ page_obj.previous_page_number }}">previous</a>
                     {% endif %}
-                    <span id="tx_hash"><a href="#" class="hash_link">{{ v.1 }}</a></span>
-                </div>
-                {% endfor %}
+            
+                    <span class="current">
+                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                    </span>
+            
+                    {% if page_obj.has_next %}
+                        <a href="?address={{ address_details.address }}&page={{ page_obj.next_page_number }}">next</a>
+                        <a href="?address={{ address_details.address }}&page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+                    {% endif %}
+                </span>
             </div>
 
         <!-- FOOTER -->

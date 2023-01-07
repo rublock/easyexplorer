@@ -47,9 +47,9 @@ class AddressView(View):
                 tx_data.append([i["confirmed"].strftime("%d.%m.%Y %H:%M"), i["tx_hash"], (i["value"] / 100000000)])
                 count += 1
 
-        pag = Paginator(tx_data, 10)
-
-        page1 = pag.page(1)
+        paginator = Paginator(tx_data, 10)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
 
         return render(
             request,
@@ -58,5 +58,6 @@ class AddressView(View):
                 "address_details": address_details,
                 "balance": balance,
                 "tx_data": tx_data,
+                "page_obj": page_obj,
             },
         )
