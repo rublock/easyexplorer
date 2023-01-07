@@ -41,7 +41,8 @@
                         <div>
                             <div class="container headerSearch">
                                 <form class="d-flex">
-                                    <input class="form-control me-2" type="search" placeholder="Enter Bitcoin address" name="address" />
+                                    <input class="form-control me-2" type="search" placeholder="Enter Bitcoin address"
+                                        name="address" />
                                     <button class="btn btn-outline-success" type="submit">Search</button>
                                 </form>
                             </div>
@@ -51,61 +52,76 @@
             </nav>
         </header>
 
-            <!-- ADDRESS DATA -->
-            <div class="container" id="data_container">
-                <div class="container mt-3" id="address_container_div_mt-3" style="padding: 0;">
-                    <div class="alert alert-light address_container">
-                        <div>
-                            <img src="{% static 'img/qr.png' %}" class="qrImg">
+        <!-- ADDRESS DATA -->
+        <div class="container" id="data_container">
+            <div class="container mt-3" id="address_container_div_mt-3" style="padding: 0;">
+                <div class="alert alert-light address_container">
+                    <div>
+                        <img src="{% static 'img/qr.png' %}" class="qrImg">
+                    </div>
+                    <div class="address_block">
+                        <div style="color:black">
+                            <div class="copyContainer">
+                                <span class="far fa-copy"></span>
+                            </div>
+                            <div>
+                                <span style="overflow-wrap: anywhere;">{{ address_details.address }}</span>
+                            </div>
                         </div>
-                        <div class="address_block">
-                            <div style="color:black">
-                                <div class="copyContainer">
-                                    <span class="far fa-copy"></span>
-                                </div>
-                                <div>
-                                    <span style="overflow-wrap: anywhere;">{{ address_details.address }}</span>
-                                </div>
+                        <div class="balance_block">
+                            <div class="curr">
+                                <i class="fa-solid fa-dollar-sign"></i>
+                                <i class="fa-solid fa-bitcoin-sign"></i>
                             </div>
-                            <div class="balance_block">
-                                <div class="curr">
-                                    <i class="fa-solid fa-dollar-sign"></i>
-                                    <i class="fa-solid fa-bitcoin-sign"></i>
-                                </div>
-                                <div class="balanceText">BTC balance</div>
-                                <div><span class="balance">{{ balance }}</span></div>
-                            </div>
-                            <div class="transactionsBlock">
-                                <div>
-                                    <span style="color:black">transactions <b id="number_of_tx">{{ address_details.n_tx }}</b></span>
-                                </div>
+                            <div class="balanceText">BTC balance</div>
+                            <div><span class="balance">{{ balance }}</span></div>
+                        </div>
+                        <div class="transactionsBlock">
+                            <div>
+                                <span style="color:black">transactions <b id="number_of_tx">{{ address_details.n_tx }}</b></span>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
 
+        <!-- TX DATA -->
+        <div class="container mt-3" id="table-body">
             {% for i in page_obj %}
-                {{ i }}
-            {% endfor %}
-
-            <div class="pagination">
-                <span class="step-links">
-                    {% if page_obj.has_previous %}
-                        <a href="?page=1">&laquo; first</a>
-                        <a href="?address={{ address_details.address }}&page={{ page_obj.previous_page_number }}">previous</a>
+            <div class="alert alert-light" style="box-shadow: 0 0 5px rgba(0,0,0,0.5);">
+                <span style="color:black; margin-right: 8px;">{{ i.0 }}</span>
+                {% if i.2 < 0 %} <span class="tx_ammount_minus">{{ i.2|floatformat:8|intcomma }}</span>
+                    {% else %}
+                    <span class="tx_ammount">{{ i.2|floatformat:8|intcomma }}</span>
                     {% endif %}
-            
-                    <span class="current">
-                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
-                    </span>
-            
-                    {% if page_obj.has_next %}
-                        <a href="?address={{ address_details.address }}&page={{ page_obj.next_page_number }}">next</a>
-                        <a href="?address={{ address_details.address }}&page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
-                    {% endif %}
-                </span>
+                    <span id="tx_hash"><a href="#" class="hash_link">{{ i.1 }}</a></span>
             </div>
+            {% endfor %}
+        </div>
+
+        <!-- PAGINATION -->
+        <div class="pagination_container">
+            <div id="pagination_wrapper" class="pagination_wrapper">
+
+                {% if page_obj.has_previous %}
+                <a href="?address={{ address_details.address }}&page=1" class="page page-link"
+                    style="border-radius: 4px 0 0 4px; border: 0; color: #000000">&#171; first</a>
+                <a href="?address={{ address_details.address }}&page={{ page_obj.previous_page_number }}"
+                    class="page page-link" style="border-radius: 0px; border: 0; color: #000000">previous</a>
+                {% endif %}
+
+                <a class="page page-link" style="border-radius: 0px; border: 0; color: #000000">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</a>
+
+                {% if page_obj.has_next %}
+                <a href="?address={{ address_details.address }}&page={{ page_obj.next_page_number }}"
+                    class="page page-link" style="border-radius: 0px; border: 0; color: #000000">next</a>
+                <a href="?address={{ address_details.address }}&page={{ page_obj.paginator.num_pages }}"
+                    class="page page-link" style="border-radius: 0 4px 4px 0; border: 0; color: #000000">last &#187;</a>
+                {% endif %}
+
+            </div>
+        </div>
 
         <!-- FOOTER -->
         <footer class="footer">
