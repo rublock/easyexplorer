@@ -17,7 +17,7 @@ class AddressView(View):
         )
         temp_list = []
         temp_array = []
-        tx_data = {}
+        tx_data = []
         count = 0
         balance = address_details["balance"] / 100000000
 
@@ -41,24 +41,15 @@ class AddressView(View):
         for i in temp_array:
             if i["tx_input_n"] > 0:
                 minus_value = 0 - i["value"]
-                tx_data[count] = [
-                    (i["confirmed"].strftime("%d.%m.%Y %H:%M")),
-                    (i["tx_hash"]),
-                    (minus_value / 100000000),
-                ]
+                tx_data.append([i["confirmed"].strftime("%d.%m.%Y %H:%M"), i["tx_hash"], (minus_value / 100000000)])
                 count += 1
             else:
-                tx_data[count] = [
-                    (i["confirmed"].strftime("%d.%m.%Y %H:%M")),
-                    (i["tx_hash"]),
-                    (i["value"] / 100000000),
-                ]
+                tx_data.append([i["confirmed"].strftime("%d.%m.%Y %H:%M"), i["tx_hash"], (i["value"] / 100000000)])
                 count += 1
 
         pag = Paginator(tx_data, 10)
-        pag_pages = [*range(pag.num_pages)]
 
-        pag_object = pag.object_list
+        page1 = pag.page(1)
 
         return render(
             request,
@@ -67,7 +58,5 @@ class AddressView(View):
                 "address_details": address_details,
                 "balance": balance,
                 "tx_data": tx_data,
-                "pag_list": pag_pages,
-                "pag_object": pag_object,
             },
         )
