@@ -4,6 +4,8 @@ from django.views.generic import TemplateView
 import qrcode
 from django.views import View
 from django.core.paginator import Paginator
+import requests
+import json
 
 
 class MainPageView(TemplateView):
@@ -12,6 +14,10 @@ class MainPageView(TemplateView):
 
 class AddressView(View):
     def get(self, request):
+
+        blockchair_API = requests.get('https://api.blockchair.com/bitcoin/stats')
+        blockchair_data = json.loads(blockchair_API.content)
+
         address_details = get_address_details(
             request.GET.get("address"), txn_limit=9999
         )
@@ -59,5 +65,6 @@ class AddressView(View):
                 "balance": balance,
                 "tx_data": tx_data,
                 "page_obj": page_obj,
+                "blockchair_data": blockchair_data,
             },
         )
