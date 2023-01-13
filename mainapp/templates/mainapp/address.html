@@ -73,8 +73,10 @@
                                 <i class="fa-solid fa-dollar-sign"></i>
                                 <i class="fa-solid fa-bitcoin-sign"></i>
                             </div>
-                            <div class="balanceText">BTC balance</div>
-                            <div><span class="balance">{{ balance|mul:blockchair_data.data.market_price_usd|floatformat:2 }}</span></div>
+                            <a style="text-decoration: none;" class="balanceToggle">
+                                <span class="btcBalance" style="color: green; font-weight: bold; margin-left: 4px;">{{ balance }} ₿</span>
+                                <span class="usdBalance hide" style="color: green; font-weight: bold; margin-left: 4px;">{{ balance|mul:blockchair_data.data.market_price_usd|floatformat:2 }} $</span>
+                            </a>
                         </div>
                         <div class="transactionsBlock">
                             <div>
