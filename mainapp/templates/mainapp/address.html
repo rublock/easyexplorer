@@ -74,8 +74,8 @@
                                 <i class="fa-solid fa-bitcoin-sign"></i>
                             </div>
                             <a style="text-decoration: none;" class="balanceToggle">
-                                <span class="btcBalance" style="color: green; font-weight: bold; margin-left: 4px;">{{ balance }} ₿</span>
-                                <span class="usdBalance hide" style="color: green; font-weight: bold; margin-left: 4px;">{{ balance|mul:blockchair_data.data.market_price_usd|floatformat:2 }} $</span>
+                                <span class="btcBalance" style="color: green; font-weight: bold; margin-left: 4px; cursor: pointer;">{{ balance }} ₿</span>
+                                <span class="usdBalance hide" style="color: green; font-weight: bold; margin-left: 4px; cursor: pointer;">{{ balance|mul:blockchair_data.data.market_price_usd|floatformat:2 }} $</span>
                             </a>
                         </div>
                         <div class="transactionsBlock">
