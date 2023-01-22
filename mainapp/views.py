@@ -22,11 +22,11 @@ class AddressView(View):
 
         try:
             address_details = get_address_details(
-                request.GET.get("address"), txn_limit=9999
+                # get data from <input name="user_search" /> base.html
+                request.GET.get("user_search"), txn_limit=9999
             )
-        except AssertionError as msg:
+        except (AssertionError, IndexError):
             error = True
-            print(f'{msg} - проверьте ваш адрес')
 
         if error == True:
             return render(request, 'mainapp/base_error.html')

@@ -40,9 +40,10 @@
                         <!-- SEARCH -->
                         <div>
                             <div class="container headerSearch">
-                                <form class="d-flex">
-                                    <input class="form-control me-2" type="search" placeholder="Enter Bitcoin address"
-                                        name="address" />
+                                <form class="d-flex" method="get" name="user_from_header">
+                                    {% csrf_token %}
+                                    <input class="form-control me-2" type="text" placeholder="Enter Bitcoin address"
+                                        name="user_search" />
                                     <button class="btn btn-outline-success" type="submit">Search</button>
                                 </form>
                             </div>
