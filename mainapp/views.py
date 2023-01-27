@@ -3,7 +3,6 @@ from django.shortcuts import render
 from django.views.generic import TemplateView
 import qrcode
 from django.views import View
-from django.core.paginator import Paginator
 import requests
 import json
 
@@ -33,7 +32,7 @@ class AddressView(View):
         else:
             temp_list = []
             temp_array = []
-            tx_data = []
+            dict = {}
             count = 0
             balance = address_details["balance"] / 100000000
 
@@ -55,17 +54,22 @@ class AddressView(View):
                     temp_array.append(i)
 
             for i in temp_array:
-                if i["tx_input_n"] > 0:
+                temp_dict = {}
+                if i["tx_input_n"] >= 0:
                     minus_value = 0 - i["value"]
-                    tx_data.append([i["confirmed"].strftime("%d.%m.%Y %H:%M"), i["tx_hash"], (minus_value / 100000000)])
+                    temp_dict[0] = i["tx_hash"]
+                    temp_dict[1] = i["confirmed"].strftime("%d.%m.%Y %H:%M")
+                    temp_dict[2] = minus_value / 100000000
+                    dict[count] = temp_dict
                     count += 1
                 else:
-                    tx_data.append([i["confirmed"].strftime("%d.%m.%Y %H:%M"), i["tx_hash"], (i["value"] / 100000000)])
+                    temp_dict[0] = i["tx_hash"]
+                    temp_dict[1] = i["confirmed"].strftime("%d.%m.%Y %H:%M")
+                    temp_dict[2] = i["value"] / 100000000
+                    dict[count] = temp_dict
                     count += 1
 
-            paginator = Paginator(tx_data, 10)
-            page_number = request.GET.get('page')
-            page_obj = paginator.get_page(page_number)
+            tx_data_json = json.dumps(dict)
 
             return render(
                 request,
@@ -73,8 +77,8 @@ class AddressView(View):
                 {
                     "address_details": address_details,
                     "balance": balance,
-                    "tx_data": tx_data,
-                    "page_obj": page_obj,
+                    "tx_data_json": tx_data_json,
                     "blockchair_data": blockchair_data,
                 },
             )
+

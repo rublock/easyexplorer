@@ -41,7 +41,6 @@
                         <div>
                             <div class="container headerSearch">
                                 <form class="d-flex" method="get" name="user_from_header">
-                                    {% csrf_token %}
                                     <input class="form-control me-2" type="text" placeholder="Enter Bitcoin address"
                                         name="address" />
                                     <button class="btn btn-outline-success" type="submit">Search</button>
@@ -54,7 +53,7 @@
         </header>
 
         <!-- ADDRESS DATA -->
-        <div class="container" id="data_container">
+        <div class="container" id="address_container">
             <div class="container mt-3" id="address_container_div_mt-3" style="padding: 0;">
                 <div class="alert alert-light address_container">
                     <div>
@@ -75,13 +74,17 @@
                                 <i class="fa-solid fa-bitcoin-sign"></i>
                             </div>
                             <a style="text-decoration: none;" class="balanceToggle">
-                                <span class="btcBalance" style="color: green; font-weight: bold; margin-left: 4px; cursor: pointer;">{{ balance }} ₿</span>
-                                <span class="usdBalance hide" style="color: green; font-weight: bold; margin-left: 4px; cursor: pointer;">{{ balance|mul:blockchair_data.data.market_price_usd|floatformat:2 }} $</span>
+                                <span class="btcBalance" style="color: green; font-weight: bold; 
+                                    margin-left: 4px; cursor: pointer;">{{ balance }} ₿</span>
+                                <span class="usdBalance hide" style="color: green; font-weight: bold; margin-left: 4px; cursor: 
+                                    pointer;">{{ balance|mul:blockchair_data.data.market_price_usd|floatformat:2 }}
+                                    $</span>
                             </a>
                         </div>
                         <div class="transactionsBlock">
                             <div>
-                                <span style="color:black">transactions <b id="number_of_tx">{{ address_details.n_tx }}</b></span>
+                                <span style="color:black">transactions
+                                    <b id="number_of_tx">{{ address_details.n_tx }}</b></span>
                             </div>
                         </div>
                     </div>
@@ -89,61 +92,10 @@
             </div>
         </div>
 
-        <!-- TX DATA -->
-        <div class="container mt-3" id="table-body">
-            {% for i in page_obj %}
-            <div class="alert alert-light" style="box-shadow: 0 0 5px rgba(0,0,0,0.5);">
-                <span style="color:black; margin-right: 8px;">{{ i.0 }}</span>
-                {% if i.2 < 0 %} <span class="tx_ammount_minus">{{ i.2|floatformat:8|intcomma }}</span>
-                    {% else %}
-                    <span class="tx_ammount">{{ i.2|floatformat:8|intcomma }}</span>
-                    {% endif %}
-                    <span id="tx_hash"><a href="#" class="hash_link">{{ i.1 }}</a></span>
-            </div>
-            {% endfor %}
-        </div>
-
-        <!-- PAGINATION -->
-        <div class="pagination_container">
-            <div id="pagination_wrapper" class="pagination_wrapper">
-
-                {% if page_obj.has_previous %}
-                <a href="?address={{ address_details.address }}&page={{ page_obj.previous_page_number }}"
-                    class="page page-link" style="border-radius: 4px 0 0 4px; border: 0; color: #000000">«</a>
-                {% if page_obj.number > 3 %}
-                <a href="?address={{ address_details.address }}&page=1" class="page page-link"
-                    style="border-radius: 4px 0 0 4px; border: 0; color: #000000">1</a>
-                {% if page_obj.number > 4 %}
-                <a class="page page-link" style="border-radius: 0px; border: 0; color: #000000">...</a>
-                {% endif %}
-                {% endif %}
-                {% endif %}
-
-                {% for num in page_obj.paginator.page_range %}
-                {% if page_obj.number == num %}
-                <a href="?address={{ address_details.address }}&page={{ num }}" class="page page-link"
-                    style="border-radius: 4px 0 0 4px; border: 0; color: #000000">{{ num }}</a>
-                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %} <a
-                    href="?address={{ address_details.address }}&page={{ num }}" class="page page-link"
-                    style="border-radius: 0px; border: 0; color: #000000">{{ num }}</a>
-                    {% endif %}
-                    {% endfor %}
-
-                    {% if page_obj.has_next %}
-                    {% if page_obj.number < page_obj.paginator.num_pages|add:'-3' %} <a class="page page-link"
-                        style="border-radius: 0; border: 0; color: #000000">...</a>
-                        <a href="?address={{ address_details.address }}&page={{ page_obj.paginator.num_pages }}"
-                            class="page page-link" style="border-radius: 0px; border: 0; color: #000000">{{ page_obj.paginator.num_pages }}</a>
-                        {% elif page_obj.number < page_obj.paginator.num_pages|add:'-2' %} <a
-                            href="?address={{ address_details.address }}&page={{ page_obj.paginator.num_pages }}"
-                            class="page page-link" style="border-radius: 0px; border: 0; color: #000000">{{ page_obj.paginator.num_pages }}</a>
-                            {% endif %}
-                            <a href="?address={{ address_details.address }}&page={{ page_obj.next_page_number }}"
-                                class="page page-link"
-                                style="border-radius: 0 4px 4px 0; border: 0; color: #000000">»</a>
-                            {% endif %}
-
-            </div>
+        <!-- DATA -->
+        <div class="container" id="data_container">
+            <span id="address_container_div"></span>
+            <span id="not_found"></span>
         </div>
 
         <!-- FOOTER -->
@@ -174,5 +126,184 @@
     integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
     crossorigin="anonymous"></script>
 <script src="{% static 'js/app.js' %}"></script>
+
+<script>
+
+    // TX and Pagination JS
+
+    document.querySelector("#data_container").insertAdjacentHTML(
+        "afterend",
+        `
+      <span id="tx_container_div"></span>`
+    );
+
+    if (!document.querySelector("#table-body")) {
+        document.querySelector("#data_container").insertAdjacentHTML(
+            "afterend",
+            `
+          <div class="pagination_container">
+            <div id="pagination_wrapper" class="pagination_wrapper"></div>
+          </div>
+          <div class="container mt-3" id="table-body"></div>
+          <div class="pagination_container">
+            <div id="pagination_wrapper_down" class="pagination_wrapper"></div>
+          </div>
+        `
+        );
+    }
+
+    function showTx(arr) {
+        console.log("show_tx() starts");
+
+        let state = {
+            querySet: arr,
+
+            page: 1,
+            rows: 50,
+            window: 7,
+        };
+
+        buildTable();
+
+        function pagination(querySet, page, rows) {
+            let trimStart = (page - 1) * rows;
+            let trimEnd = trimStart + rows;
+
+            let trimmedData = querySet.slice(trimStart, trimEnd);
+
+            let pages = Math.ceil(querySet.length / rows);
+
+            return {
+                querySet: trimmedData,
+                pages: pages,
+            };
+        }
+
+        function pageButtons(pages) {
+            let wrapper = document.querySelector("#pagination_wrapper");
+            let wrapper_down = document.querySelector("#pagination_wrapper_down");
+
+            wrapper.innerHTML = ``;
+            wrapper_down.innerHTML = ``;
+
+            let maxLeft = state.page - Math.floor(state.window / 2);
+            let maxRight = state.page + Math.floor(state.window / 2);
+
+            if (maxLeft < 1) {
+                maxLeft = 1;
+                maxRight = state.window;
+            }
+
+            if (maxRight > pages) {
+                maxLeft = pages - (state.window - 1);
+
+                if (maxLeft < 1) {
+                    maxLeft = 1;
+                }
+                maxRight = pages;
+            }
+
+            for (let page = maxLeft; page <= maxRight; page++) {
+                wrapper.innerHTML += `<button value=${page} class="page page-link" style="border-radius: 0px; border: 0; color: #000000">${page}</button>`;
+                wrapper_down.innerHTML += `<button value=${page} class="page page-link" style="border-radius: 0px; border: 0; color: #000000" onclick="window.scroll(0,0);">${page}</button>`;
+            }
+
+            wrapper.innerHTML =
+                `<button value=${1} class="page page-link" style="border-radius: 4px 0 0 4px; border: 0; color: #000000">&#171;</button>` +
+                wrapper.innerHTML;
+            wrapper_down.innerHTML =
+                `<button value=${1} class="page page-link" style="border-radius: 4px 0 0 4px; border: 0; color: #000000" onclick="window.scroll(0,0);">&#171;</button>` +
+                wrapper_down.innerHTML;
+
+            wrapper.innerHTML += `<button value=${pages} class="page page-link" style="border-radius: 0 4px 4px 0; border: 0; color: #000000">&#187;</button>`;
+            wrapper_down.innerHTML += `<button value=${pages} class="page page-link" style="border-radius: 0 4px 4px 0; border: 0; color: #000000" onclick="window.scroll(0,0);">&#187;</button>`;
+
+            document.querySelector(".page").addEventListener("click", function () {
+                document.getElementById("#table-body").empty();
+                state.page = Number(this.val());
+                buildTable();
+            });
+        }
+
+        function buildTable() {
+            console.log("buildTable()");
+
+            let table = document.querySelector("#table-body");
+
+            console.log(state);
+            let data = pagination(state.querySet, state.page, state.rows);
+            let myList = data.querySet;
+            console.log(myList);
+
+            for (let i in myList) {
+                //Keep in mind we are using "Template Litterals to create rows"
+
+
+
+
+
+                if (myList[i][3] < 300) {
+                    //ЕСЛИ ПОДТВЕРЖДЕНИЙ МЕНЬШЕ ЧЕМ 6
+                    if (myList[i][2] < 0) {
+                        var row = `
+                <div class="h-10 alert alert-warning" style="box-shadow: 0 0 5px rgba(0,0,0,0.5);">
+                  <span class="tx_date">NEW ${myList[i][1]}</span>
+                  <span id="tx_ammount" class="tx_ammount_minus">${myList[i][2]}</span>
+                  <span id="tx_hash" class="tx_hash"><a href="#" class="hash_link"> ${myList[i][0]
+                            }</a></span>
+                </div>
+                 `;
+                    } else {
+                        var row = `
+                <div class="h-10 alert alert-warning" style="box-shadow: 0 0 5px rgba(0,0,0,0.5);">
+                  <span class="tx_date">NEW ${myList[i][1]}</span>
+                  <span id="tx_ammount" class="tx_ammount">+${myList[i][2]}</span>
+                  <span id="tx_hash" class="tx_hash"><a href="#" class="hash_link"> ${myList[i][0]
+                            }</a></span>
+                </div>
+                 `;
+                    }
+
+                } else if (myList[i][2] < 0) {
+                    //ЕСЛИ МИНУС
+                    var row = `
+                <div class="alert alert-light" style="box-shadow: 0 0 5px rgba(0,0,0,0.5);">
+                  <span class="tx_date">${myList[i][1]}</span>
+                  <span id="tx_ammount" class="tx_ammount_minus">${myList[i][2]}</span>
+                  <span id="tx_hash" class="tx_hash"><a href="#" class="hash_link"> ${myList[i][0]
+                        }</a></span>
+                </div>
+                 `;
+                } else {
+                    console.log(myList[i][2])
+                    //ИНАЧЕ СТАНДАРНЫЙ СТИЛЬ
+                    var row = `
+                <div class="alert alert-light" style="box-shadow: 0 0 5px rgba(0,0,0,0.5);">
+                  <span class="tx_date">${myList[i][1]}</span>
+                  <span id="tx_ammount" class="tx_ammount">+${myList[i][2]}</span>
+                  <span id="tx_hash" class="tx_hash"><a href="#" class="hash_link"> ${myList[i][0]
+                        }</a></span>
+                </div>
+                 `;
+                }
+
+                table.insertAdjacentHTML("afterend", row);
+            }
+
+            pageButtons(data.pages);
+        }
+    }
+
+    data = '{{ tx_data_json|safe }}' //тут строка, надо попробовать принять json
+    jsonData = JSON.parse(data)
+    arr = []
+
+    for (let i = 0; i < Object.keys(jsonData).length; i++) {
+        arr.push(jsonData[i])
+    }
+
+    showTx(arr)
+
+</script>
 
 </html>
