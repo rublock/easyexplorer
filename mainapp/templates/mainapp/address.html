@@ -65,7 +65,7 @@
                                 <span class="far fa-copy"></span>
                             </div>
                             <div>
-                                <span style="overflow-wrap: anywhere;">{{ address_details.address }}</span>
+                                <span style="overflow-wrap: anywhere;">{{ address }}</span>
                             </div>
                         </div>
                         <div class="balance_block">
@@ -84,7 +84,7 @@
                         <div class="transactionsBlock">
                             <div>
                                 <span style="color:black">transactions
-                                    <b id="number_of_tx">{{ address_details.n_tx }}</b></span>
+                                    <b id="number_of_tx">{{ n_tx }}</b></span>
                             </div>
                         </div>
                     </div>
@@ -93,9 +93,7 @@
         </div>
 
         <!-- DATA -->
-        <div class="container" id="data_container">
-            <span id="address_container_div"></span>
-            <span id="not_found"></span>
+        <div class="container" id="address_container">
         </div>
 
         <!-- FOOTER -->
@@ -125,20 +123,15 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
     crossorigin="anonymous"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 <script src="{% static 'js/app.js' %}"></script>
 
+
+// TX and Pagination JS
 <script>
 
-    // TX and Pagination JS
-
-    document.querySelector("#data_container").insertAdjacentHTML(
-        "afterend",
-        `
-      <span id="tx_container_div"></span>`
-    );
-
     if (!document.querySelector("#table-body")) {
-        document.querySelector("#data_container").insertAdjacentHTML(
+        document.querySelector("#address_container").insertAdjacentHTML(
             "afterend",
             `
           <div class="pagination_container">
@@ -153,13 +146,12 @@
     }
 
     function showTx(arr) {
-        console.log("show_tx() starts");
 
         let state = {
             querySet: arr,
 
             page: 1,
-            rows: 50,
+            rows: 10,
             window: 7,
         };
 
@@ -218,32 +210,24 @@
             wrapper.innerHTML += `<button value=${pages} class="page page-link" style="border-radius: 0 4px 4px 0; border: 0; color: #000000">&#187;</button>`;
             wrapper_down.innerHTML += `<button value=${pages} class="page page-link" style="border-radius: 0 4px 4px 0; border: 0; color: #000000" onclick="window.scroll(0,0);">&#187;</button>`;
 
-            document.querySelector(".page").addEventListener("click", function () {
-                document.getElementById("#table-body").empty();
-                state.page = Number(this.val());
+            $(".page").on("click", function () {
+                $("#table-body").empty();
+                state.page = Number($(this).val());
                 buildTable();
             });
+
         }
 
         function buildTable() {
-            console.log("buildTable()");
 
             let table = document.querySelector("#table-body");
 
-            console.log(state);
             let data = pagination(state.querySet, state.page, state.rows);
             let myList = data.querySet;
-            console.log(myList);
 
             for (let i in myList) {
-                //Keep in mind we are using "Template Litterals to create rows"
-
-
-
-
-
+                //if confirmations < 300 //DOESN'T WORK!!!
                 if (myList[i][3] < 300) {
-                    //ЕСЛИ ПОДТВЕРЖДЕНИЙ МЕНЬШЕ ЧЕМ 6
                     if (myList[i][2] < 0) {
                         var row = `
                 <div class="h-10 alert alert-warning" style="box-shadow: 0 0 5px rgba(0,0,0,0.5);">
@@ -265,7 +249,7 @@
                     }
 
                 } else if (myList[i][2] < 0) {
-                    //ЕСЛИ МИНУС
+                    //if minus
                     var row = `
                 <div class="alert alert-light" style="box-shadow: 0 0 5px rgba(0,0,0,0.5);">
                   <span class="tx_date">${myList[i][1]}</span>
@@ -275,8 +259,7 @@
                 </div>
                  `;
                 } else {
-                    console.log(myList[i][2])
-                    //ИНАЧЕ СТАНДАРНЫЙ СТИЛЬ
+                    //standart style
                     var row = `
                 <div class="alert alert-light" style="box-shadow: 0 0 5px rgba(0,0,0,0.5);">
                   <span class="tx_date">${myList[i][1]}</span>
@@ -287,22 +270,28 @@
                  `;
                 }
 
-                table.insertAdjacentHTML("afterend", row);
+                table.insertAdjacentHTML("beforeend", row);
             }
 
             pageButtons(data.pages);
         }
     }
 
-    data = '{{ tx_data_json|safe }}' //тут строка, надо попробовать принять json
-    jsonData = JSON.parse(data)
-    arr = []
+    let data = '{{ tx_data_json|safe }}' //data from django
+    let jsonData = JSON.parse(data)
+    let arr = []
+    let count = 0
 
     for (let i = 0; i < Object.keys(jsonData).length; i++) {
-        arr.push(jsonData[i])
+        let dict = {}
+        dict[0] = jsonData[i]['hash']
+        dict[1] = jsonData[i]['time']
+        dict[2] = jsonData[i]['result'] / 100000000
+        arr.push(dict)
+        count += 1
     }
 
-    showTx(arr)
+    showTx(arr) //let's start the show -_-
 
 </script>
 
