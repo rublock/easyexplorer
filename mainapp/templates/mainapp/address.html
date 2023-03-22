@@ -126,7 +126,7 @@
 <script src="{% static 'js/app.js' %}"></script>
 
 
-// TX and Pagination JS
+<!-- TX and Pagination JS -->
 <script>
 
     if (!document.querySelector("#table-body")) {
@@ -217,6 +217,24 @@
 
         }
 
+        function timeConverter(UNIX_timestamp) {
+            let data = new Date(UNIX_timestamp * 1000);
+            let months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            let year = data.getFullYear();
+            let month = months[data.getMonth()];
+            let date = data.getDate();
+            let hour = data.getHours();
+            let min = data.getMinutes();
+            if (min < 10) {
+                let zero = '0'
+                zero += min
+                min = zero
+            }
+            // let sec = data.getSeconds();
+            let time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min;
+            return time;
+        }
+
         function buildTable() {
 
             let table = document.querySelector("#table-body");
@@ -225,34 +243,24 @@
             let myList = data.querySet;
 
             for (let i in myList) {
-                //if confirmations < 300 //DOESN'T WORK!!!
-                if (myList[i][3] < 300) {
-                    if (myList[i][2] < 0) {
-                        row = `
-                <div class="h-10 alert alert-warning" style="box-shadow: 0 0 5px rgba(0,0,0,0.5);">
-                  <span class="tx_date">NEW ${myList[i][1]}</span>
-                  <span id="tx_ammount" class="tx_ammount_minus">${myList[i][2]}</span>
-                  <span id="tx_hash" class="tx_hash"><a href="#" class="hash_link"> ${myList[i][0]
-                            }</a></span>
-                </div>
-                 `;
-                    } else {
-                        row = `
-                <div class="h-10 alert alert-warning" style="box-shadow: 0 0 5px rgba(0,0,0,0.5);">
-                  <span class="tx_date">NEW ${myList[i][1]}</span>
-                  <span id="tx_ammount" class="tx_ammount">${myList[i][2]}</span>
-                  <span id="tx_hash" class="tx_hash"><a href="#" class="hash_link"> ${myList[i][0]
-                            }</a></span>
-                </div>
-                 `;
-                    }
 
-                } else if (myList[i][2] < 0) {
-                    //if minus
+                let setMinus = document.querySelectorAll('.tx_ammount');
+                setMinus.forEach(elem => {
+                    val = parseFloat(elem.innerHTML)
+                    if (val < 0) {
+                        elem.classList.remove('tx_ammount');
+                        elem.classList.add('tx_ammount_minus');
+                    }
+                })
+
+                date_time = timeConverter(myList[i][1]);
+
+                if ((Date.now() / 1000) - myList[i][1] < 7200) {
+                    //new tx 7200 = 2 hours
                     row = `
-                <div class="alert alert-light" style="box-shadow: 0 0 5px rgba(0,0,0,0.5);">
-                  <span class="tx_date">${myList[i][1]}</span>
-                  <span id="tx_ammount" class="tx_ammount_minus">${myList[i][2]}</span>
+                <div class="alert alert-warning" style="box-shadow: 0 0 5px rgba(0,0,0,0.5);">
+                  <span class="tx_date">${date_time}</span>
+                  <span id="tx_ammount" class="tx_ammount">${myList[i][2]}</span>
                   <span id="tx_hash" class="tx_hash"><a href="#" class="hash_link"> ${myList[i][0]
                         }</a></span>
                 </div>
@@ -261,7 +269,7 @@
                     //standart style
                     row = `
                 <div class="alert alert-light" style="box-shadow: 0 0 5px rgba(0,0,0,0.5);">
-                  <span class="tx_date">${myList[i][1]}</span>
+                  <span class="tx_date">${date_time}</span>
                   <span id="tx_ammount" class="tx_ammount">${myList[i][2]}</span>
                   <span id="tx_hash" class="tx_hash"><a href="#" class="hash_link"> ${myList[i][0]
                         }</a></span>
@@ -281,22 +289,9 @@
     let arr = []
     let count = 0
 
-    function timeConverter(UNIX_timestamp) {
-        let data = new Date(UNIX_timestamp * 1000);
-        let months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        let year = data.getFullYear();
-        let month = months[data.getMonth()];
-        let date = data.getDate();
-        let hour = data.getHours();
-        let min = data.getMinutes();
-        // let sec = data.getSeconds();
-        let time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min;
-        return time;
-    }
-
     for (let i = 0; i < Object.keys(jsonData).length; i++) {
         let dict = {}
-        date_time = timeConverter(jsonData[i]['time']);
+        date_time = jsonData[i]['time'];
         let value = (jsonData[i]['result'] / 100000000).toFixed(8)
         dict[0] = jsonData[i]['hash']
         dict[1] = date_time
@@ -306,6 +301,8 @@
     }
 
     showTx(arr) //let's start the show -_-
+
+
 
 </script>
 
