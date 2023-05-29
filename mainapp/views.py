@@ -50,9 +50,9 @@ class AddressView(View):
             for i in txids:
                 tx_data.append(i)
 
-            paginator = Paginator(tx_data, 10)
-            page_number = request.GET.get("page")
-            page_obj = paginator.get_page(page_number)
+            # paginator = Paginator(tx_data, 10)
+            # page_number = request.GET.get("page")
+            # page_obj = paginator.get_page(page_number)
 
             return render(
                 request,
@@ -62,7 +62,7 @@ class AddressView(View):
                     "tx_count": tx_count,
                     "balance": balance,
                     "tx_data": tx_data,
-                    "page_obj": page_obj,
+                    # "page_obj": page_obj,
                     "blockchair_data": blockchair_data,
                 },
             )
