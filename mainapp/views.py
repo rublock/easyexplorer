@@ -23,18 +23,17 @@ class AddressView(View):
             address_data = requests.get(
                 f"http://127.0.0.1:3002/api/address/{user_search}?limit=9999"
             )
-            address_data_json = address_data.json()
-            txids = address_data_json["txHistory"]["txids"]
-            tx_count = address_data_json["txHistory"]["txCount"]
+            get_content = address_data._content
+            address_data_json = json.loads(get_content)
+            api_data = json.dumps(address_data_json["txHistory"])
             address = address_data_json["validateaddress"]["address"]
+            tx_num = address_data_json["txHistory"]["txCount"]
         except (AssertionError, IndexError):
             error = True
 
         if error == True:
             return render(request, "mainapp/base_error.html")
         else:
-            tx_data = []
-
             balance = address_data_json["txHistory"]["balanceSat"] / 100000000
 
             qr = qrcode.QRCode(
@@ -47,22 +46,14 @@ class AddressView(View):
 
             img.save("static/img/qr.png")
 
-            for i in txids:
-                tx_data.append(i)
-
-            # paginator = Paginator(tx_data, 10)
-            # page_number = request.GET.get("page")
-            # page_obj = paginator.get_page(page_number)
-
             return render(
                 request,
                 "mainapp/address.html",
                 {
                     "address": address,
-                    "tx_count": tx_count,
+                    "api_data": api_data,
                     "balance": balance,
-                    "tx_data": tx_data,
-                    # "page_obj": page_obj,
+                    "tx_num": tx_num,
                     "blockchair_data": blockchair_data,
                 },
             )

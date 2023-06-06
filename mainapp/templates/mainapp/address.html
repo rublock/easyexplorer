@@ -83,7 +83,7 @@
                         <div class="transactionsBlock">
                             <div>
                                 <span style="color:black">transactions
-                                    <b id="number_of_tx">{{ n_tx }}</b></span>
+                                    <b id="number_of_tx">{{ tx_num }}</b></span>
                             </div>
                         </div>
                     </div>
@@ -283,37 +283,29 @@
         }
     }
 
-    let django_data = {{ tx_data|safe }} //data from django
-    // let jsonData = JSON.parse(data)
-    console.log(django_data)
-    let arr = []
-    let count = 0
+    let apiData = '{{ api_data|safe }}' //data from django
+    let jsonData = JSON.parse(apiData)
+    let txids = jsonData['txids']
 
-    for (let i = 0; i < Object.keys(django_data).length; i++) {
+    async function fetchApiData(txids) {
 
-        const api = fetch(`http://127.0.0.1:3002/api/tx/${django_data[i]}`)
-                .then((response) => response.json())
-                .then((data) => {
-            return data;
-        });
+        let arr = []
+        
+            for (let i = 0; i < Object.keys(txids).length; i++) {
+                let responce = await fetch(`http://127.0.0.1:3002/api/tx/${txids[i]}`)
+                let data = await responce.json()
+                let dict = {}
+                dict[0] = data['txid']
+                dict[1] = data['time']
+                dict[2] = null
+                arr.push(dict)
+            }
 
-        const logJSONData = (django_data) => {
-            api.then((data) => {
-            let dict = {}
-            dict[0] = data['hash'] //OK
-            dict[1] = data['time'] //OK
-            dict[2] = data['version']
-            arr.push(dict)
-            });
-        };
+            showTx(arr) //let's start the show -_-
 
-        logJSONData(django_data);
+        }
 
-    }
-
-    console.log(arr)
-
-    showTx(arr) //let's start the show -_-
+    fetchApiData(txids);
 
 </script>
 
