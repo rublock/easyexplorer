@@ -208,11 +208,11 @@
             wrapper.innerHTML += `<button value=${pages} class="page page-link" style="border-radius: 0 4px 4px 0; border: 0; color: #000000">&#187;</button>`;
             wrapper_down.innerHTML += `<button value=${pages} class="page page-link" style="border-radius: 0 4px 4px 0; border: 0; color: #000000" onclick="window.scroll(0,0);">&#187;</button>`;
 
-            $(".page").on("click", function () {
-                $("#table-body").empty();
-                state.page = Number($(this).val());
+            document.querySelectorAll(".page").forEach(e => e.addEventListener("click",  function () {
+                document.querySelector("#table-body").innerHTML = ``;
+                state.page = Number(this.value);
                 buildTable();
-            });
+            }))
 
         }
 
