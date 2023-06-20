@@ -1,8 +1,8 @@
-{% load static %}
 
-{% load humanize %}
 
-{% load mathfilters %}
+
+
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -14,7 +14,7 @@
     <title>btcblockexplorer.io</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}" type="text/css" media="screen">
+    <link rel="stylesheet" href="/static/css/styles.css" type="text/css" media="screen">
 </head>
 
 <body>
@@ -24,9 +24,9 @@
         <header class="container-fluid p-0" id="header_div">
             <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
                 <div class="container-fluid">
-                    <a href="{% url 'mainapp:home' %}"><img class="logo" src="{% static 'img/logo.png' %}"
+                    <a href="/"><img class="logo" src="/static/img/logo.png"
                             alt="logo"></a>
-                    <a class="navbar-brand" href="{% url 'mainapp:home' %}">btcblockexplorer.io</a>
+                    <a class="navbar-brand" href="/">btcblockexplorer.io</a>
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                         data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
@@ -56,7 +56,7 @@
             <div class="container mt-3" id="address_container_div_mt-3" style="padding: 0;">
                 <div class="alert alert-light address_container">
                     <div>
-                        <img src="{% static 'img/qr.png' %}" class="qrImg">
+                        <img src="/static/img/qr.png" class="qrImg">
                     </div>
                     <div class="address_block">
                         <div style="color:black">
@@ -64,7 +64,7 @@
                                 <span class="far fa-copy"></span>
                             </div>
                             <div>
-                                <span style="overflow-wrap: anywhere;">{{ address }}</span>
+                                <span style="overflow-wrap: anywhere;">1GicDd3XUgowrkzmJCPo6MjoeR5GmWTjEQ</span>
                             </div>
                         </div>
                         <div class="balance_block">
@@ -74,16 +74,16 @@
                             </div>
                             <a style="text-decoration: none;" class="balanceToggle">
                                 <span class="btcBalance" style="color: green; font-weight: bold; 
-                                    margin-left: 4px; cursor: pointer;">{{ balance }} ₿</span>
+                                    margin-left: 4px; cursor: pointer;">0.224701 ₿</span>
                                 <span class="usdBalance hide" style="color: green; font-weight: bold; margin-left: 4px; cursor: 
-                                    pointer;">{{ balance|mul:blockchair_data.data.market_price_usd|floatformat:2 }}
+                                    pointer;">6035.02
                                     $</span>
                             </a>
                         </div>
                         <div class="transactionsBlock">
                             <div>
                                 <span style="color:black">transactions
-                                    <b id="number_of_tx">{{ n_tx }}</b></span>
+                                    <b id="number_of_tx">19</b></span>
                             </div>
                         </div>
                     </div>
@@ -123,8 +123,7 @@
     integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
     crossorigin="anonymous"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-<script src="{% static 'js/app.js' %}"></script>
-
+<script src="/static/js/app.js"></script>
 
 <!-- TX and Pagination JS -->
 <script>
@@ -144,165 +143,188 @@
         );
     }
 
-    function showTx(arr) {
+    let apiData = '{"txCount": 19, "txids": ["bb57d5af158d83a7b826fd0f34d82d5db789d5a79b9424669ccd026899533460", "642237854c156bfddcad0a562bcf7fe8d094389892d0169c04ba14adf5d5ef11", "144f1ef2fd161b67f20eac710f3535935a996804da55bec7633f3bf57e5b40f8", "a4b85a91f9a7dce1b7cf14faf7232297d19c4aa52c263c308aa586fee3a83e40", "f8893e043ea8ba228140ec3750a3a15cf45a8d387a562146f2f214f8296ac603", "50a2468061d921247ac83c9932070887ec1375c37e79815222ab67bff2a523ea", "b48cb0c79ee7bb71297f02ce1263936869614e5367b68b54cc1f6db477a64bc5", "f74a1e66a07e56ae65624a55577ca8fa09bbe8f35635410a7e904d6e595c5a22", "4b8d2549c39df9ff3ca6f480d62349941bf65ec55c0740d806b3012876792f09", "34ed263ec5b008589a704026cfab48c7275cc73f43f8fb95f131fc347977b28d", "ffcac3258162d40b6cd11e0e31f934c2a7a21c70caec10d537d27e16b5b3941b", "9ca0b4faab98854a682aa73014578574df73b0342ed98fcd66fefed267cf8507", "7f4c3b0e497916e1ac97a011eddf2079710ffc814a3e5ed023dfab4b431d14cf", "b1c6668fe8b5aae2a492dd8a3d89d8cc15b67b8043089ca07eed5124a6dd3d32", "627497957df1b9b2b9a43e65a652351fba39478dbef8c5dd62adda83bf9c05c0", "9db3347a8158974e8a66e22bc1eb79f12d9013cfd32f3b165cb6d928d67f57ca", "7ecafdc214f862e026f14054e16494a403b4a8376934ca5323bba5dd6d2781a9", "2480c60747d6097fded4f0d3d2b7a56b4541d73577cf52a7c7f8ae217370d372", "c7d2a8360344cdfe1180f03ebbe8f3ef262278563b40c5b6f40c853215084705"], "blockHeightsByTxid": {"bb57d5af158d83a7b826fd0f34d82d5db789d5a79b9424669ccd026899533460": 792078, "642237854c156bfddcad0a562bcf7fe8d094389892d0169c04ba14adf5d5ef11": 791916, "144f1ef2fd161b67f20eac710f3535935a996804da55bec7633f3bf57e5b40f8": 791034, "a4b85a91f9a7dce1b7cf14faf7232297d19c4aa52c263c308aa586fee3a83e40": 787126, "f8893e043ea8ba228140ec3750a3a15cf45a8d387a562146f2f214f8296ac603": 761517, "50a2468061d921247ac83c9932070887ec1375c37e79815222ab67bff2a523ea": 738962, "b48cb0c79ee7bb71297f02ce1263936869614e5367b68b54cc1f6db477a64bc5": 736237, "f74a1e66a07e56ae65624a55577ca8fa09bbe8f35635410a7e904d6e595c5a22": 724917, "4b8d2549c39df9ff3ca6f480d62349941bf65ec55c0740d806b3012876792f09": 710678, "34ed263ec5b008589a704026cfab48c7275cc73f43f8fb95f131fc347977b28d": 695391, "ffcac3258162d40b6cd11e0e31f934c2a7a21c70caec10d537d27e16b5b3941b": 691177, "9ca0b4faab98854a682aa73014578574df73b0342ed98fcd66fefed267cf8507": 674722, "7f4c3b0e497916e1ac97a011eddf2079710ffc814a3e5ed023dfab4b431d14cf": 674722, "b1c6668fe8b5aae2a492dd8a3d89d8cc15b67b8043089ca07eed5124a6dd3d32": 665909, "627497957df1b9b2b9a43e65a652351fba39478dbef8c5dd62adda83bf9c05c0": 661639, "9db3347a8158974e8a66e22bc1eb79f12d9013cfd32f3b165cb6d928d67f57ca": 657490, "7ecafdc214f862e026f14054e16494a403b4a8376934ca5323bba5dd6d2781a9": 656631, "2480c60747d6097fded4f0d3d2b7a56b4541d73577cf52a7c7f8ae217370d372": 656631, "c7d2a8360344cdfe1180f03ebbe8f3ef262278563b40c5b6f40c853215084705": 556729}, "balanceSat": 22470100, "request": {"limit": 9999, "offset": 0, "sort": "desc"}}' //data from django
+    let address = '1GicDd3XUgowrkzmJCPo6MjoeR5GmWTjEQ' //data from django
+    let jsonData = JSON.parse(apiData)
+    let txIds = jsonData['txids']
+    let txCount = jsonData['txCount']
+    let arr = []
 
-        let state = {
-            querySet: arr,
+    let state = {
+        querySet: arr,
 
-            page: 1,
-            rows: 10,
-            window: 7,
-        };
+        page: 1,
+        rows: 10,
+        window: 7,
+    };
 
-        buildTable();
+    getDataFromApi(txIds, txCount);
 
-        function pagination(querySet, page, rows) {
-            let trimStart = (page - 1) * rows;
-            let trimEnd = trimStart + rows;
+    async function getDataFromApi(txIds, txCount) {
+        txIdsSliced = txIds.slice(0, 10)
 
-            let trimmedData = querySet.slice(trimStart, trimEnd);
+        arr = []
 
-            let pages = Math.ceil(querySet.length / rows);
+        state.querySet = ``
+        
+        for (let i = 0; i < Object.keys(txIdsSliced).length; i++) {
+            let responce = await fetch(`http://127.0.0.1:3002/api/tx/${txIds[i]}`)
+            let data = await responce.json()
+            let dict = {}
+            dict[0] = data['txid']
+            dict[1] = data['time']
 
-            return {
-                querySet: trimmedData,
-                pages: pages,
-            };
+            if (data.vin[0].scriptSig.address == address) {
+                let minusValue = 0
+                for (let i = 0; i < data.vout.length; i++) {
+                    if (data.vout[i].scriptPubKey.address != address) {
+                        minusValue -= data.vout[i].value
+                    }
+                }
+                dict[2] = (minusValue - data.fee.amount).toFixed(8)
+            } else {
+                for (let i = 0; i < data.vout.length; i++) {
+                    if (data.vout[i].scriptPubKey.address == address) {
+                        dict[2] = (data.vout[i].value).toFixed(8)
+                    }
+                }
+            }
+
+            arr.push(dict)
+            
         }
 
-        function pageButtons(pages) {
-            let wrapper = document.querySelector("#pagination_wrapper");
-            let wrapper_down = document.querySelector("#pagination_wrapper_down");
+        state.querySet = arr
 
-            wrapper.innerHTML = ``;
-            wrapper_down.innerHTML = ``;
+        if (arr.length != 0) {
+            buildTxRows();
+        }
 
-            let maxLeft = state.page - Math.floor(state.window / 2);
-            let maxRight = state.page + Math.floor(state.window / 2);
+    }
+
+    function paginationPagesCalc(querySet, rows) {
+        let trimmedData = querySet
+        let pages = Math.ceil(txCount / rows);
+        
+        return {
+            querySet: trimmedData,
+            pages: pages,
+        };
+    }
+
+    function makePaginationButtons(pages) {
+        let wrapper = document.querySelector("#pagination_wrapper");
+        let wrapper_down = document.querySelector("#pagination_wrapper_down");
+
+        wrapper.innerHTML = ``;
+        wrapper_down.innerHTML = ``;
+
+        let maxLeft = state.page - Math.floor(state.window / 2);
+        let maxRight = state.page + Math.floor(state.window / 2);
+
+        if (maxLeft < 1) {
+            maxLeft = 1;
+            maxRight = state.window;
+        }
+
+        if (maxRight > pages) {
+            maxLeft = pages - (state.window - 1);
 
             if (maxLeft < 1) {
                 maxLeft = 1;
-                maxRight = state.window;
             }
-
-            if (maxRight > pages) {
-                maxLeft = pages - (state.window - 1);
-
-                if (maxLeft < 1) {
-                    maxLeft = 1;
-                }
-                maxRight = pages;
-            }
-
-            for (let page = maxLeft; page <= maxRight; page++) {
-                wrapper.innerHTML += `<button value=${page} class="page page-link" style="border-radius: 0px; border: 0; color: #000000">${page}</button>`;
-                wrapper_down.innerHTML += `<button value=${page} class="page page-link" style="border-radius: 0px; border: 0; color: #000000" onclick="window.scroll(0,0);">${page}</button>`;
-            }
-
-            wrapper.innerHTML =
-                `<button value=${1} class="page page-link" style="border-radius: 4px 0 0 4px; border: 0; color: #000000">&#171;</button>` +
-                wrapper.innerHTML;
-            wrapper_down.innerHTML =
-                `<button value=${1} class="page page-link" style="border-radius: 4px 0 0 4px; border: 0; color: #000000" onclick="window.scroll(0,0);">&#171;</button>` +
-                wrapper_down.innerHTML;
-
-            wrapper.innerHTML += `<button value=${pages} class="page page-link" style="border-radius: 0 4px 4px 0; border: 0; color: #000000">&#187;</button>`;
-            wrapper_down.innerHTML += `<button value=${pages} class="page page-link" style="border-radius: 0 4px 4px 0; border: 0; color: #000000" onclick="window.scroll(0,0);">&#187;</button>`;
-
-            $(".page").on("click", function () {
-                $("#table-body").empty();
-                state.page = Number($(this).val());
-                buildTable();
-            });
-
+            maxRight = pages;
         }
 
-        function timeConverter(UNIX_timestamp) {
-            let data = new Date(UNIX_timestamp * 1000);
-            let months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            let year = data.getFullYear();
-            let month = months[data.getMonth()];
-            let date = data.getDate();
-            let hour = data.getHours();
-            let min = data.getMinutes();
-            if (min < 10) {
-                let zero = '0'
-                zero += min
-                min = zero
-            }
-            // let sec = data.getSeconds();
-            let time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min;
-            return time;
+        for (let page = maxLeft; page <= maxRight; page++) {
+            wrapper.innerHTML += `<button value=${page} class="page page-link" style="border-radius: 0px; border: 0; color: #000000">${page}</button>`;
+            wrapper_down.innerHTML += `<button value=${page} class="page page-link" style="border-radius: 0px; border: 0; color: #000000" onclick="window.scroll(0,0);">${page}</button>`;
         }
 
-        function buildTable() {
+        wrapper.innerHTML =
+            `<button value=${1} class="page page-link" style="border-radius: 4px 0 0 4px; border: 0; color: #000000">&#171;</button>` +
+            wrapper.innerHTML;
+        wrapper_down.innerHTML =
+            `<button value=${1} class="page page-link" style="border-radius: 4px 0 0 4px; border: 0; color: #000000" onclick="window.scroll(0,0);">&#171;</button>` +
+            wrapper_down.innerHTML;
 
-            let table = document.querySelector("#table-body");
+        wrapper.innerHTML += `<button value=${pages} class="page page-link" style="border-radius: 0 4px 4px 0; border: 0; color: #000000">&#187;</button>`;
+        wrapper_down.innerHTML += `<button value=${pages} class="page page-link" style="border-radius: 0 4px 4px 0; border: 0; color: #000000" onclick="window.scroll(0,0);">&#187;</button>`;
 
-            let data = pagination(state.querySet, state.page, state.rows);
-            let myList = data.querySet;
+        document.querySelectorAll(".page").forEach(e => e.addEventListener("click",  function () {
+            document.querySelector("#table-body").innerHTML = ``;
+            state.page = Number(this.value);
+            txIdsSliced = txIds.slice((state.page * 10) - 10, state.page * 10)
+            getDataFromApi(txIdsSliced, txCount);
+            buildTxRows(); //после того как получили номер страницы ассинхронный код уже не запускается...
+        }))
 
-            for (let i in myList) {
-
-                let setMinus = document.querySelectorAll('.tx_ammount');
-                setMinus.forEach(elem => {
-                    val = parseFloat(elem.innerHTML)
-                    if (val < 0) {
-                        elem.classList.remove('tx_ammount');
-                        elem.classList.add('tx_ammount_minus');
-                    }
-                })
-
-                date_time = timeConverter(myList[i][1]);
-
-                if ((Date.now() / 1000) - myList[i][1] < 7200) {
-                    //new tx 7200 = 2 hours
-                    row = `
-                <div class="alert alert-warning" style="box-shadow: 0 0 5px rgba(0,0,0,0.5);">
-                  <span class="tx_date">${date_time}</span>
-                  <span id="tx_ammount" class="tx_ammount">${myList[i][2]}</span>
-                  <span id="tx_hash" class="tx_hash"><a href="#" class="hash_link"> ${myList[i][0]
-                        }</a></span>
-                </div>
-                 `;
-                } else {
-                    //standart style
-                    row = `
-                <div class="alert alert-light" style="box-shadow: 0 0 5px rgba(0,0,0,0.5);">
-                  <span class="tx_date">${date_time}</span>
-                  <span id="tx_ammount" class="tx_ammount">${myList[i][2]}</span>
-                  <span id="tx_hash" class="tx_hash"><a href="#" class="hash_link"> ${myList[i][0]
-                        }</a></span>
-                </div>
-                 `;
-                }
-
-                table.insertAdjacentHTML("beforeend", row);
-            }
-
-            pageButtons(data.pages);
-        }
     }
 
-    let data = '{{ tx_data_json|safe }}' //data from django
-    let jsonData = JSON.parse(data)
-    let arr = []
-    let count = 0
-
-    for (let i = 0; i < Object.keys(jsonData).length; i++) {
-        let dict = {}
-        date_time = jsonData[i]['time'];
-        let value = (jsonData[i]['result'] / 100000000).toFixed(8)
-        dict[0] = jsonData[i]['hash']
-        dict[1] = date_time
-        dict[2] = value
-        arr.push(dict)
-        count += 1
+    function timeConverter(UNIX_timestamp) {
+        let data = new Date(UNIX_timestamp * 1000);
+        let months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        let year = data.getFullYear();
+        let month = months[data.getMonth()];
+        let date = data.getDate();
+        let hour = data.getHours();
+        let min = data.getMinutes();
+        if (min < 10) {
+            let zero = '0'
+            zero += min
+            min = zero
+        }
+        // let sec = data.getSeconds();
+        let time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min;
+        return time;
     }
 
-    showTx(arr) //let's start the show -_-
+    function buildTxRows() {
+        let table = document.querySelector("#table-body");
+        let data = paginationPagesCalc(state.querySet, state.rows);
+        let myList = data.querySet;
 
+        for (let i in myList) {
 
+            let setMinus = document.querySelectorAll('.tx_ammount');
+            setMinus.forEach(elem => {
+                val = parseFloat(elem.innerHTML)
+                if (val < 0) {
+                    elem.classList.remove('tx_ammount');
+                    elem.classList.add('tx_ammount_minus');
+                }
+            })
+
+            date_time = timeConverter(myList[i][1]);
+
+            if ((Date.now() / 1000) - myList[i][1] < 7200) {
+                //new tx 7200 = 2 hours
+                row = `
+            <div class="alert alert-warning" style="box-shadow: 0 0 5px rgba(0,0,0,0.5);">
+            <span class="tx_date">${date_time}</span>
+            <span id="tx_ammount" class="tx_ammount">${myList[i][2]}</span>
+            <span id="tx_hash" class="tx_hash"><a href="#" class="hash_link"> ${myList[i][0]
+                    }</a></span>
+            </div>
+            `;
+            } else {
+                //standart style
+                row = `
+            <div class="alert alert-light" style="box-shadow: 0 0 5px rgba(0,0,0,0.5);">
+            <span class="tx_date">${date_time}</span>
+            <span id="tx_ammount" class="tx_ammount">${myList[i][2]}</span>
+            <span id="tx_hash" class="tx_hash"><a href="#" class="hash_link"> ${myList[i][0]
+                    }</a></span>
+            </div>
+            `;
+            }
+
+            table.insertAdjacentHTML("beforeend", row);
+        }
+
+    makePaginationButtons(data.pages);
+
+    }
 
 </script>
 
