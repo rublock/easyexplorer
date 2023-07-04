@@ -1,8 +1,8 @@
+{% load static %}
 
+{% load humanize %}
 
-
-
-
+{% load mathfilters %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -64,7 +64,7 @@
                                 <span class="far fa-copy"></span>
                             </div>
                             <div>
-                                <span style="overflow-wrap: anywhere;">1GicDd3XUgowrkzmJCPo6MjoeR5GmWTjEQ</span>
+                                <span style="overflow-wrap: anywhere;">{{ address }}</span>
                             </div>
                         </div>
                         <div class="balance_block">
@@ -74,16 +74,16 @@
                             </div>
                             <a style="text-decoration: none;" class="balanceToggle">
                                 <span class="btcBalance" style="color: green; font-weight: bold; 
-                                    margin-left: 4px; cursor: pointer;">0.224701 ₿</span>
+                                    margin-left: 4px; cursor: pointer;">{{ balance }} ₿</span>
                                 <span class="usdBalance hide" style="color: green; font-weight: bold; margin-left: 4px; cursor: 
-                                    pointer;">6035.02
+                                    pointer;">{{ balance|mul:blockchair_data.data.market_price_usd|floatformat:2 }} 
                                     $</span>
                             </a>
                         </div>
                         <div class="transactionsBlock">
                             <div>
                                 <span style="color:black">transactions
-                                    <b id="number_of_tx">19</b></span>
+                                    <b id="number_of_tx">{{ tx_num }}</b></span>
                             </div>
                         </div>
                     </div>
@@ -143,8 +143,8 @@
         );
     }
 
-    let apiData = '{"txCount": 19, "txids": ["bb57d5af158d83a7b826fd0f34d82d5db789d5a79b9424669ccd026899533460", "642237854c156bfddcad0a562bcf7fe8d094389892d0169c04ba14adf5d5ef11", "144f1ef2fd161b67f20eac710f3535935a996804da55bec7633f3bf57e5b40f8", "a4b85a91f9a7dce1b7cf14faf7232297d19c4aa52c263c308aa586fee3a83e40", "f8893e043ea8ba228140ec3750a3a15cf45a8d387a562146f2f214f8296ac603", "50a2468061d921247ac83c9932070887ec1375c37e79815222ab67bff2a523ea", "b48cb0c79ee7bb71297f02ce1263936869614e5367b68b54cc1f6db477a64bc5", "f74a1e66a07e56ae65624a55577ca8fa09bbe8f35635410a7e904d6e595c5a22", "4b8d2549c39df9ff3ca6f480d62349941bf65ec55c0740d806b3012876792f09", "34ed263ec5b008589a704026cfab48c7275cc73f43f8fb95f131fc347977b28d", "ffcac3258162d40b6cd11e0e31f934c2a7a21c70caec10d537d27e16b5b3941b", "9ca0b4faab98854a682aa73014578574df73b0342ed98fcd66fefed267cf8507", "7f4c3b0e497916e1ac97a011eddf2079710ffc814a3e5ed023dfab4b431d14cf", "b1c6668fe8b5aae2a492dd8a3d89d8cc15b67b8043089ca07eed5124a6dd3d32", "627497957df1b9b2b9a43e65a652351fba39478dbef8c5dd62adda83bf9c05c0", "9db3347a8158974e8a66e22bc1eb79f12d9013cfd32f3b165cb6d928d67f57ca", "7ecafdc214f862e026f14054e16494a403b4a8376934ca5323bba5dd6d2781a9", "2480c60747d6097fded4f0d3d2b7a56b4541d73577cf52a7c7f8ae217370d372", "c7d2a8360344cdfe1180f03ebbe8f3ef262278563b40c5b6f40c853215084705"], "blockHeightsByTxid": {"bb57d5af158d83a7b826fd0f34d82d5db789d5a79b9424669ccd026899533460": 792078, "642237854c156bfddcad0a562bcf7fe8d094389892d0169c04ba14adf5d5ef11": 791916, "144f1ef2fd161b67f20eac710f3535935a996804da55bec7633f3bf57e5b40f8": 791034, "a4b85a91f9a7dce1b7cf14faf7232297d19c4aa52c263c308aa586fee3a83e40": 787126, "f8893e043ea8ba228140ec3750a3a15cf45a8d387a562146f2f214f8296ac603": 761517, "50a2468061d921247ac83c9932070887ec1375c37e79815222ab67bff2a523ea": 738962, "b48cb0c79ee7bb71297f02ce1263936869614e5367b68b54cc1f6db477a64bc5": 736237, "f74a1e66a07e56ae65624a55577ca8fa09bbe8f35635410a7e904d6e595c5a22": 724917, "4b8d2549c39df9ff3ca6f480d62349941bf65ec55c0740d806b3012876792f09": 710678, "34ed263ec5b008589a704026cfab48c7275cc73f43f8fb95f131fc347977b28d": 695391, "ffcac3258162d40b6cd11e0e31f934c2a7a21c70caec10d537d27e16b5b3941b": 691177, "9ca0b4faab98854a682aa73014578574df73b0342ed98fcd66fefed267cf8507": 674722, "7f4c3b0e497916e1ac97a011eddf2079710ffc814a3e5ed023dfab4b431d14cf": 674722, "b1c6668fe8b5aae2a492dd8a3d89d8cc15b67b8043089ca07eed5124a6dd3d32": 665909, "627497957df1b9b2b9a43e65a652351fba39478dbef8c5dd62adda83bf9c05c0": 661639, "9db3347a8158974e8a66e22bc1eb79f12d9013cfd32f3b165cb6d928d67f57ca": 657490, "7ecafdc214f862e026f14054e16494a403b4a8376934ca5323bba5dd6d2781a9": 656631, "2480c60747d6097fded4f0d3d2b7a56b4541d73577cf52a7c7f8ae217370d372": 656631, "c7d2a8360344cdfe1180f03ebbe8f3ef262278563b40c5b6f40c853215084705": 556729}, "balanceSat": 22470100, "request": {"limit": 9999, "offset": 0, "sort": "desc"}}' //data from django
-    let address = '1GicDd3XUgowrkzmJCPo6MjoeR5GmWTjEQ' //data from django
+    let apiData = '{{ api_data|safe }}' //data from django
+    let address = '{{ address }}' //data from django
     let jsonData = JSON.parse(apiData)
     let txIds = jsonData['txids']
     let txCount = jsonData['txCount']
