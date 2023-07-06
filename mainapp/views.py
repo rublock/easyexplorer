@@ -36,15 +36,15 @@ class AddressView(View):
         else:
             balance = address_data_json["txHistory"]["balanceSat"] / 100000000
 
-            # qr = qrcode.QRCode(
-            #     box_size=10,
-            #     border=6,
-            # )
-            # qr.add_data(address_data_json["validateaddress"]["address"])
+            qr = qrcode.QRCode(
+                box_size=10,
+                border=6,
+            )
+            qr.add_data(address_data_json["validateaddress"]["address"])
 
-            # img = qr.make_image(fill_color="#F7931A", back_color="white")
+            img = qr.make_image(fill_color="#F7931A", back_color="white")
 
-            # img.save("static/img/qr.png")
+            img.save("static/img/qr.png")
 
             return render(
                 request,
