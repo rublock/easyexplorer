@@ -128,7 +128,58 @@
 <!-- TX and Pagination JS -->
 <script>
 
-    test
+    //data from django
+    let apiData = '{{ api_data|safe }}'
+    let address = '{{ address }}'
+    let jsonData = JSON.parse(apiData)
+    let txIds = jsonData['txids']
+    let txCount = jsonData['txCount']
+
+    let promise = new Promise((resolve, reject) => {
+
+        txIdsSliced = txIds.slice(0, 10)  
+        
+        arr = []
+
+        for (let i = 0; i < Object.keys(txIdsSliced).length; i++) {
+            fetch(`http://127.0.0.1:3002/api/tx/${txIds[i]}`)
+            .then(response => response.json())
+            .then(data => {
+
+                let dict = {}
+                dict[0] = data['txid']
+                dict[1] = data['time']
+
+                if (data.vin[0].scriptSig.address == address) {
+                    let minusValue = 0
+                    for (let i = 0; i < data.vout.length; i++) {
+                        if (data.vout[i].scriptPubKey.address != address) {
+                            minusValue -= data.vout[i].value
+                        }
+                    }
+                    dict[2] = (minusValue - data.fee.amount).toFixed(8)
+                } else {
+                    for (let i = 0; i < data.vout.length; i++) {
+                        if (data.vout[i].scriptPubKey.address == address) {
+                            dict[2] = (data.vout[i].value).toFixed(8)
+                        }
+                    }
+                }
+
+                arr.push(dict)
+            })
+        }
+
+        resolve(arr)
+
+    })
+
+    promise.then(arr => {
+        console.log(arr)
+    })
+        
+
+
 
 </script>
 

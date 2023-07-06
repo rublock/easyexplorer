@@ -44,7 +44,7 @@ class AddressView(View):
 
             img = qr.make_image(fill_color="#F7931A", back_color="white")
 
-            img.save("static/img/qr.png")
+            # img.save("static/img/qr.png")
 
             return render(
                 request,
