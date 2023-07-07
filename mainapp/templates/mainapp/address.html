@@ -136,68 +136,95 @@
     let txCount = jsonData['txCount']
     let txRows = 10
     let txWindow = 7
-    let pages = Math.ceil(txCount / txRows);
+    let pages = Math.ceil(txCount / txRows)
     let txIdsSliced = txIds.slice(0, 10)
-
-    arrayAssembler(txIdsSliced);
-
-    async function fetchUrlInLoop(i) {
-        const url = `http://127.0.0.1:3002/api/tx/${txIds[i]}`;
-        return await fetch(url).then((res) => res.json());
-    }
+    arr = []
 
     async function arrayAssembler(txIdsSliced) {
         let promises = [];
+
         for (let i = 0; i < Object.keys(txIdsSliced).length; i++) {
-            promises.push(fetchUrlInLoop(i));
+            promises.push(fetchUrlInLoop(i))
         }
-        let arr = await Promise.all(promises);
-        buildTxRows(arr); //кажись заработало!!!
-    }
 
-    function buildTxRows(arr) {
+        let data = await Promise.all(promises);
+        
+        for (let i = 0; i < data.length; i++) {
 
-        let table = document.querySelector("#table-body");
+            let dict = {}
+            dict[0] = data[i].txid   
+            dict[1] = data[i].time
 
-        for (let i in arr) {
-
-            let setMinus = document.querySelectorAll('.tx_ammount');
-            setMinus.forEach(elem => {
-                val = parseFloat(elem.innerHTML)
-                if (val < 0) {
-                    elem.classList.remove('tx_ammount');
-                    elem.classList.add('tx_ammount_minus');
+            if (data[i].vin[0].scriptSig.address == address) {
+                let minusValue = 0
+                for (let j = 0; j < data[i].vout.length; j++) {
+                    if (data[i].vout[j].scriptPubKey.address != address) {
+                        minusValue -= data[i].vout[j].value
+                    }
                 }
-            })
-
-            date_time = timeConverter(arr[i][1]);
-
-            if ((Date.now() / 1000) - arr[i][1] < 7200) {
-                //new tx 7200 = 2 hours
-                row = `
-            <div class="alert alert-warning" style="box-shadow: 0 0 5px rgba(0,0,0,0.5);">
-            <span class="tx_date">${date_time}</span>
-            <span id="tx_ammount" class="tx_ammount">${arr[i][2]}</span>
-            <span id="tx_hash" class="tx_hash"><a href="#" class="hash_link"> ${arr[i][0]
-                    }</a></span>
-            </div>
-            `;
+                dict[2] = (minusValue - data[i].fee.amount).toFixed(8)
             } else {
-                //standart style
-                row = `
-            <div class="alert alert-light" style="box-shadow: 0 0 5px rgba(0,0,0,0.5);">
-            <span class="tx_date">${date_time}</span>
-            <span id="tx_ammount" class="tx_ammount">${arr[i][2]}</span>
-            <span id="tx_hash" class="tx_hash"><a href="#" class="hash_link"> ${arr[i][0]
-                    }</a></span>
-            </div>
-            `;
+                for (let j = 0; j < data[i].vout.length; j++) {
+                    if (data[i].vout[j].scriptPubKey.address == address) {
+                        dict[2] = (data[i].vout[j].value).toFixed(8)
+                    }
+                }
             }
-
-            table.insertAdjacentHTML("beforeend", row);
+            arr.push(dict)
         }
-
+        buildTxRows(arr)
     }
+
+    async function fetchUrlInLoop(i) {
+        const url = `http://127.0.0.1:3002/api/tx/${txIds[i]}`
+        return await fetch(url).then((res) => res.json())
+    }
+
+    arrayAssembler(txIdsSliced)
+
+    // function buildTxRows(arr) {
+
+    //     let table = document.querySelector("#table-body");
+
+    //     for (let i in arr) {
+
+    //         let setMinus = document.querySelectorAll('.tx_ammount')
+    //         setMinus.forEach(elem => {
+    //             val = parseFloat(elem.innerHTML)
+    //             if (val < 0) {
+    //                 elem.classList.remove('tx_ammount');
+    //                 elem.classList.add('tx_ammount_minus');
+    //             }
+    //         })
+
+    //         date_time = timeConverter(arr[i][1]);
+
+    //         if ((Date.now() / 1000) - arr[i][1] < 7200) {
+    //             //new tx 7200 = 2 hours
+    //             row = `
+    //         <div class="alert alert-warning" style="box-shadow: 0 0 5px rgba(0,0,0,0.5);">
+    //         <span class="tx_date">${date_time}</span>
+    //         <span id="tx_ammount" class="tx_ammount">${arr[i][2]}</span>
+    //         <span id="tx_hash" class="tx_hash"><a href="#" class="hash_link"> ${arr[i][0]
+    //                 }</a></span>
+    //         </div>
+    //         `;
+    //         } else {
+    //             //standart style
+    //             row = `
+    //         <div class="alert alert-light" style="box-shadow: 0 0 5px rgba(0,0,0,0.5);">
+    //         <span class="tx_date">${date_time}</span>
+    //         <span id="tx_ammount" class="tx_ammount">${arr[i][2]}</span>
+    //         <span id="tx_hash" class="tx_hash"><a href="#" class="hash_link"> ${arr[i][0]
+    //                 }</a></span>
+    //         </div>
+    //         `;
+    //         }
+
+    //         table.insertAdjacentHTML("beforeend", row);
+    //     }
+
+    // }
 
 </script>
 
