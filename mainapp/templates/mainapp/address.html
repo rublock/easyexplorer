@@ -250,8 +250,50 @@
 
             table.insertAdjacentHTML("beforeend", row);
         }
-
+        makePaginationButtons(pages)
     }
+
+    function makePaginationButtons(pages) {
+        let wrapper = document.querySelector("#pagination_wrapper");
+        let wrapper_down = document.querySelector("#pagination_wrapper_down");
+
+        wrapper.innerHTML = ``;
+        wrapper_down.innerHTML = ``;
+
+        let maxLeft = pages - Math.floor(txWindow / 2);
+        let maxRight = pages + Math.floor(txWindow / 2);
+
+        if (maxLeft < 1) {
+            maxLeft = 1;
+            maxRight = txWindow;
+        }
+
+        if (maxRight > pages) {
+            maxLeft = pages - (txWindow - 1);
+
+            if (maxLeft < 1) {
+                maxLeft = 1;
+            }
+            maxRight = pages;
+        }
+
+        for (let page = maxLeft; page <= maxRight; page++) {
+            wrapper.innerHTML += `<button value=${page} class="page page-link" style="border-radius: 0px; border: 0; color: #000000">${page}</button>`;
+            wrapper_down.innerHTML += `<button value=${page} class="page page-link" style="border-radius: 0px; border: 0; color: #000000" onclick="window.scroll(0,0);">${page}</button>`;
+        }
+
+        wrapper.innerHTML =
+            `<button value=${1} class="page page-link" style="border-radius: 4px 0 0 4px; border: 0; color: #000000">&#171;</button>` +
+            wrapper.innerHTML;
+        wrapper_down.innerHTML =
+            `<button value=${1} class="page page-link" style="border-radius: 4px 0 0 4px; border: 0; color: #000000" onclick="window.scroll(0,0);">&#171;</button>` +
+            wrapper_down.innerHTML;
+
+        wrapper.innerHTML += `<button value=${pages} class="page page-link" style="border-radius: 0 4px 4px 0; border: 0; color: #000000">&#187;</button>`;
+        wrapper_down.innerHTML += `<button value=${pages} class="page page-link" style="border-radius: 0 4px 4px 0; border: 0; color: #000000" onclick="window.scroll(0,0);">&#187;</button>`;
+    }
+
+    
 
 </script>
 
