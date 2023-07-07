@@ -150,7 +150,10 @@
     arr = []
 
     async function arrayAssembler(txIdsSliced) {
-        let promises = [];
+
+        arr = []
+
+        let promises = []
 
         for (let i = 0; i < Object.keys(txIdsSliced).length; i++) {
             promises.push(fetchUrlInLoop(i))
@@ -185,7 +188,7 @@
     }
 
     async function fetchUrlInLoop(i) {
-        const url = `http://127.0.0.1:3002/api/tx/${txIds[i]}`
+        const url = `http://127.0.0.1:3002/api/tx/${txIdsSliced[i]}`
         return await fetch(url).then((res) => res.json())
     }
 
@@ -291,7 +294,18 @@
 
         wrapper.innerHTML += `<button value=${pages} class="page page-link" style="border-radius: 0 4px 4px 0; border: 0; color: #000000">&#187;</button>`;
         wrapper_down.innerHTML += `<button value=${pages} class="page page-link" style="border-radius: 0 4px 4px 0; border: 0; color: #000000" onclick="window.scroll(0,0);">&#187;</button>`;
+        
+        document.querySelectorAll(".page").forEach(e => e.addEventListener("click",  function () {
+            document.querySelector("#table-body").innerHTML = ``;
+            page = Number(this.value);
+            txIdsSliced = txIds.slice((page * 10) - 10, page * 10)
+            arrayAssembler(txIdsSliced)
+            // buildTxRows(); //после того как получили номер страницы ассинхронный код уже не запускается...
+        }))
+    
     }
+
+
 
     
 
