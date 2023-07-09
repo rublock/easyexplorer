@@ -24,9 +24,8 @@
         <header class="container-fluid p-0" id="header_div">
             <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
                 <div class="container-fluid">
-                    <a href="/"><img class="logo" src="/static/img/logo.png"
-                            alt="logo"></a>
-                    <a class="navbar-brand" href="/">btcblockexplorer.io</a>
+                    <a href="/"><img class="logo" src="/static/img/logo.png" alt="logo"></a>
+                    <a class="navbar-brand" href="/">easyExplorer.io</a>
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                         data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
@@ -76,7 +75,7 @@
                                 <span class="btcBalance" style="color: green; font-weight: bold; 
                                     margin-left: 4px; cursor: pointer;">{{ balance }} ₿</span>
                                 <span class="usdBalance hide" style="color: green; font-weight: bold; margin-left: 4px; cursor: 
-                                    pointer;">{{ balance|mul:blockchair_data.data.market_price_usd|floatformat:2 }} 
+                                    pointer;">{{ balance|mul:blockchair_data.data.market_price_usd|floatformat:2 }}
                                     $</span>
                             </a>
                         </div>
@@ -91,8 +90,13 @@
             </div>
         </div>
 
-        <!-- DATA -->
-        <div class="container" id="address_container">
+        <!-- TXs and PAGINATION -->
+        <div class="pagination_container">
+            <div id="pagination_wrapper" class="pagination_wrapper"></div>
+        </div>
+        <div class="container mt-3" id="table-body"></div>
+        <div class="pagination_container">
+            <div id="pagination_wrapper_down" class="pagination_wrapper"></div>
         </div>
 
         <!-- FOOTER -->
@@ -128,138 +132,60 @@
 <!-- TX and Pagination JS -->
 <script>
 
-    if (!document.querySelector("#table-body")) {
-        document.querySelector("#address_container").insertAdjacentHTML(
-            "afterend",
-            `
-          <div class="pagination_container">
-            <div id="pagination_wrapper" class="pagination_wrapper"></div>
-          </div>
-          <div class="container mt-3" id="table-body"></div>
-          <div class="pagination_container">
-            <div id="pagination_wrapper_down" class="pagination_wrapper"></div>
-          </div>
-        `
-        );
-    }
+    let apiData = '{{ api_data|safe }}';
+    let address = '{{ address }}';
+    let jsonData = JSON.parse(apiData);
+    let txIds = jsonData['txids'];
+    let txCount = jsonData['txCount'];
+    let txRows = 10;
+    let txWindow = 7;
+    let pages = Math.ceil(txCount / txRows);
+    let pagePressed = 1;
+    let txIdsSliced = txIds.slice(0, 10);
+    let arr = [];
 
-    let apiData = '{{ api_data|safe }}' //data from django
-    let address = '{{ address }}' //data from django
-    let jsonData = JSON.parse(apiData)
-    let txIds = jsonData['txids']
-    let txCount = jsonData['txCount']
-    let arr = []
+    async function arrayAssembler(txIdsSliced) {
 
-    let state = {
-        querySet: arr,
+        let promises = [];
 
-        page: 1,
-        rows: 10,
-        window: 7,
-    };
-
-    getDataFromApi(txIds, txCount);
-
-    async function getDataFromApi(txIds, txCount) {
-        txIdsSliced = txIds.slice(0, 10)
-
-        arr = []
-
-        state.querySet = ``
-        
         for (let i = 0; i < Object.keys(txIdsSliced).length; i++) {
-            let responce = await fetch(`http://127.0.0.1:3002/api/tx/${txIds[i]}`)
-            let data = await responce.json()
-            let dict = {}
-            dict[0] = data['txid']
-            dict[1] = data['time']
+            promises.push(fetchUrlInLoop(i));
+        }
 
-            if (data.vin[0].scriptSig.address == address) {
-                let minusValue = 0
-                for (let i = 0; i < data.vout.length; i++) {
-                    if (data.vout[i].scriptPubKey.address != address) {
-                        minusValue -= data.vout[i].value
+        let data = await Promise.all(promises);
+
+        for (let i = 0; i < data.length; i++) {
+
+            let dict = {};
+            dict[0] = data[i].txid;
+            dict[1] = data[i].time;
+
+            if (data[i].vin[0].scriptSig.address == address) {
+                let minusValue = 0;
+                for (let j = 0; j < data[i].vout.length; j++) {
+                    if (data[i].vout[j].scriptPubKey.address != address) {
+                        minusValue -= data[i].vout[j].value;
                     }
                 }
-                dict[2] = (minusValue - data.fee.amount).toFixed(8)
+                dict[2] = (minusValue - data[i].fee.amount).toFixed(8);
             } else {
-                for (let i = 0; i < data.vout.length; i++) {
-                    if (data.vout[i].scriptPubKey.address == address) {
-                        dict[2] = (data.vout[i].value).toFixed(8)
+                for (let j = 0; j < data[i].vout.length; j++) {
+                    if (data[i].vout[j].scriptPubKey.address == address) {
+                        dict[2] = (data[i].vout[j].value).toFixed(8);
                     }
                 }
             }
-
-            arr.push(dict)
-            
+            arr.push(dict);
         }
-
-        state.querySet = arr
-
-        if (arr.length != 0) {
-            buildTxRows();
-        }
-
+        buildTxRows(arr);
     }
 
-    function paginationPagesCalc(querySet, rows) {
-        let trimmedData = querySet
-        let pages = Math.ceil(txCount / rows);
-        
-        return {
-            querySet: trimmedData,
-            pages: pages,
-        };
+    async function fetchUrlInLoop(i) {
+        const url = `http://127.0.0.1:3002/api/tx/${txIdsSliced[i]}`;
+        return await fetch(url).then((res) => res.json());
     }
 
-    function makePaginationButtons(pages) {
-        let wrapper = document.querySelector("#pagination_wrapper");
-        let wrapper_down = document.querySelector("#pagination_wrapper_down");
-
-        wrapper.innerHTML = ``;
-        wrapper_down.innerHTML = ``;
-
-        let maxLeft = state.page - Math.floor(state.window / 2);
-        let maxRight = state.page + Math.floor(state.window / 2);
-
-        if (maxLeft < 1) {
-            maxLeft = 1;
-            maxRight = state.window;
-        }
-
-        if (maxRight > pages) {
-            maxLeft = pages - (state.window - 1);
-
-            if (maxLeft < 1) {
-                maxLeft = 1;
-            }
-            maxRight = pages;
-        }
-
-        for (let page = maxLeft; page <= maxRight; page++) {
-            wrapper.innerHTML += `<button value=${page} class="page page-link" style="border-radius: 0px; border: 0; color: #000000">${page}</button>`;
-            wrapper_down.innerHTML += `<button value=${page} class="page page-link" style="border-radius: 0px; border: 0; color: #000000" onclick="window.scroll(0,0);">${page}</button>`;
-        }
-
-        wrapper.innerHTML =
-            `<button value=${1} class="page page-link" style="border-radius: 4px 0 0 4px; border: 0; color: #000000">&#171;</button>` +
-            wrapper.innerHTML;
-        wrapper_down.innerHTML =
-            `<button value=${1} class="page page-link" style="border-radius: 4px 0 0 4px; border: 0; color: #000000" onclick="window.scroll(0,0);">&#171;</button>` +
-            wrapper_down.innerHTML;
-
-        wrapper.innerHTML += `<button value=${pages} class="page page-link" style="border-radius: 0 4px 4px 0; border: 0; color: #000000">&#187;</button>`;
-        wrapper_down.innerHTML += `<button value=${pages} class="page page-link" style="border-radius: 0 4px 4px 0; border: 0; color: #000000" onclick="window.scroll(0,0);">&#187;</button>`;
-
-        document.querySelectorAll(".page").forEach(e => e.addEventListener("click",  function () {
-            document.querySelector("#table-body").innerHTML = ``;
-            state.page = Number(this.value);
-            txIdsSliced = txIds.slice((state.page * 10) - 10, state.page * 10)
-            getDataFromApi(txIdsSliced, txCount);
-            buildTxRows(); //после того как получили номер страницы ассинхронный код уже не запускается...
-        }))
-
-    }
+    arrayAssembler(txIdsSliced);
 
     function timeConverter(UNIX_timestamp) {
         let data = new Date(UNIX_timestamp * 1000);
@@ -270,40 +196,39 @@
         let hour = data.getHours();
         let min = data.getMinutes();
         if (min < 10) {
-            let zero = '0'
-            zero += min
-            min = zero
+            let zero = '0';
+            zero += min;
+            min = zero;;
         }
         // let sec = data.getSeconds();
         let time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min;
         return time;
     }
 
-    function buildTxRows() {
+    function buildTxRows(arr) {
+
         let table = document.querySelector("#table-body");
-        let data = paginationPagesCalc(state.querySet, state.rows);
-        let myList = data.querySet;
 
-        for (let i in myList) {
+        for (let i = 0; i < arr.length; i++) {
 
-            let setMinus = document.querySelectorAll('.tx_ammount');
+            let setMinus = document.querySelectorAll('.tx_ammount')
             setMinus.forEach(elem => {
-                val = parseFloat(elem.innerHTML)
+                val = parseFloat(elem.innerHTML);
                 if (val < 0) {
                     elem.classList.remove('tx_ammount');
                     elem.classList.add('tx_ammount_minus');
                 }
             })
 
-            date_time = timeConverter(myList[i][1]);
+            date_time = timeConverter(arr[i][1]);
 
-            if ((Date.now() / 1000) - myList[i][1] < 7200) {
-                //new tx 7200 = 2 hours
+            if ((Date.now() / 1000) - arr[i][1] < 21600) {
+                //new tx 21600 = 6 hours
                 row = `
             <div class="alert alert-warning" style="box-shadow: 0 0 5px rgba(0,0,0,0.5);">
             <span class="tx_date">${date_time}</span>
-            <span id="tx_ammount" class="tx_ammount">${myList[i][2]}</span>
-            <span id="tx_hash" class="tx_hash"><a href="#" class="hash_link"> ${myList[i][0]
+            <span id="tx_ammount" class="tx_ammount">${arr[i][2]}</span>
+            <span id="tx_hash" class="tx_hash"><a href="#" class="hash_link"> ${arr[i][0]
                     }</a></span>
             </div>
             `;
@@ -312,8 +237,8 @@
                 row = `
             <div class="alert alert-light" style="box-shadow: 0 0 5px rgba(0,0,0,0.5);">
             <span class="tx_date">${date_time}</span>
-            <span id="tx_ammount" class="tx_ammount">${myList[i][2]}</span>
-            <span id="tx_hash" class="tx_hash"><a href="#" class="hash_link"> ${myList[i][0]
+            <span id="tx_ammount" class="tx_ammount">${arr[i][2]}</span>
+            <span id="tx_hash" class="tx_hash"><a href="#" class="hash_link"> ${arr[i][0]
                     }</a></span>
             </div>
             `;
@@ -321,8 +246,67 @@
 
             table.insertAdjacentHTML("beforeend", row);
         }
+        makePaginationButtons(pages);
+    }
 
-    makePaginationButtons(data.pages);
+    function makePaginationButtons(pages) {
+        let wrapper = document.querySelector("#pagination_wrapper");
+        let wrapper_down = document.querySelector("#pagination_wrapper_down");
+
+        let maxLeft = pagePressed - Math.floor(txWindow / 2);
+        let maxRight = pagePressed + Math.floor(txWindow / 2);
+
+        if (maxLeft < 1) {
+            maxLeft = 1;
+            maxRight = txWindow;
+        }
+
+        if (maxRight > pages) {
+            maxLeft = pages - (txWindow - 1);
+
+            if (maxLeft < 1) {
+                maxLeft = 1;
+            }
+            maxRight = pages;
+        }
+
+        for (let page = maxLeft; page <= maxRight; page++) {
+            if (page === pagePressed) {
+                wrapper.innerHTML += `<button value=${page} class="page page-link" 
+                style="font-weight: bold; border-radius: 0px; border: 0; color: #F7931A">${page}</button>`;
+                wrapper_down.innerHTML += `<button value=${page} class="page page-link" 
+                style="font-weight: bold; border-radius: 0px; border: 0; color: #F7931A" onclick="window.scroll(0,0);">${page}</button>`;
+            } else {
+                wrapper.innerHTML += `<button value=${page} class="page page-link" 
+                style="border-radius: 0px; border: 0; color: #000000">${page}</button>`;
+                wrapper_down.innerHTML += `<button value=${page} class="page page-link" 
+                style="border-radius: 0px; border: 0; color: #000000" onclick="window.scroll(0,0);">${page}</button>`;
+            }
+        }
+
+        wrapper.innerHTML =
+            `<button value=${1} class="page page-link" 
+            style="border-radius: 4px 0 0 4px; border: 0; color: #000000">&#171;</button>` +
+            wrapper.innerHTML;
+        wrapper_down.innerHTML =
+            `<button value=${1} class="page page-link" 
+            style="border-radius: 4px 0 0 4px; border: 0; color: #000000" onclick="window.scroll(0,0);">&#171;</button>` +
+            wrapper_down.innerHTML;
+
+        wrapper.innerHTML += `<button value=${pages} class="page page-link" 
+        style="border-radius: 0 4px 4px 0; border: 0; color: #000000">&#187;</button>`;
+        wrapper_down.innerHTML += `<button value=${pages} class="page page-link" 
+        style="border-radius: 0 4px 4px 0; border: 0; color: #000000" onclick="window.scroll(0,0);">&#187;</button>`;
+
+        document.querySelectorAll(".page").forEach(e => e.addEventListener("click", function () {
+            document.querySelector("#table-body").innerHTML = ``;
+            pagePressed = Number(this.value);
+            txIdsSliced = txIds.slice((pagePressed * 10) - 10, pagePressed * 10);
+            arrayAssembler(txIdsSliced);
+            arr = [];
+            wrapper.innerHTML = ``;
+            wrapper_down.innerHTML = ``;
+        }))
 
     }
 
