@@ -82,7 +82,7 @@
                         <div class="transactionsBlock">
                             <div>
                                 <span style="color:black">transactions
-                                    <b id="number_of_tx">{{ tx_num }}</b></span>
+                                    <b id="number_of_tx"></b></span>
                             </div>
                         </div>
                     </div>
@@ -143,6 +143,8 @@
     let pagePressed = 1;
     let txIdsSliced = txIds.slice(0, 10);
     let arr = [];
+
+    document.querySelector("#number_of_tx").innerHTML = jsonData.txCount
 
     async function arrayAssembler(txIdsSliced) {
 

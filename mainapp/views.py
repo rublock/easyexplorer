@@ -27,7 +27,6 @@ class AddressView(View):
             address_data_json = json.loads(get_content)
             api_data = json.dumps(address_data_json["txHistory"])
             address = address_data_json["validateaddress"]["address"]
-            tx_num = address_data_json["txHistory"]["txCount"]
         except (AssertionError, IndexError):
             error = True
 
@@ -53,7 +52,6 @@ class AddressView(View):
                     "address": address,
                     "api_data": api_data,
                     "balance": balance,
-                    "tx_num": tx_num,
                     "blockchair_data": blockchair_data,
                 },
             )
