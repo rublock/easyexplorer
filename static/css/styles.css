@@ -140,3 +140,44 @@ body::-webkit-scrollbar-thumb {
     justify-content: center;
     margin-top: auto;
 }
+
+/* LOADING ANIMATION */
+.loading {
+    max-width: 50%;
+    line-height: 1.4;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-align: center;
+    background: transparent;
+  }
+  
+  .loadWords {
+    font-weight: normal;
+    font-size: 0.9rem;
+    color: rgba(189, 189, 189, 1);
+    margin: 0.6rem 0 2rem 0;
+    display: block;
+  }
+  
+  .loading__anim {
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(189, 189, 189, 0.25);
+    border-left-color: #F7931A;
+    border-top-color: #F7931A;
+    border-radius: 50%;
+    display: inline-block;
+    animation: rotate 600ms infinite linear;
+  }
+  
+  @keyframes rotate {
+    to {
+      transform: rotate(1turn);
+    }
+  }
+
+  .loader_wrapper {
+    display: none;
+    justify-content: center;
+    align-items: center;
+  }
