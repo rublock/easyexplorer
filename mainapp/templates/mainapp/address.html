@@ -99,6 +99,13 @@
             <div id="pagination_wrapper_down" class="pagination_wrapper"></div>
         </div>
 
+        <!-- LOADER -->
+        <div class="loader_wrapper">
+            <section class="loading">
+                <span class="loading__anim"></span>
+            </section>
+        </div>
+
         <!-- FOOTER -->
         <footer class="footer mt-auto py-3 bg-light">
             <ul class="nav justify-content-center border-bottom pb-3 mb-3">
@@ -308,7 +315,10 @@
             arr = [];
             wrapper.innerHTML = ``;
             wrapper_down.innerHTML = ``;
+            document.querySelector(".loader_wrapper").style.display = 'flex';
         }))
+
+        document.querySelector(".loader_wrapper").style.display = 'none';
 
     }
 
