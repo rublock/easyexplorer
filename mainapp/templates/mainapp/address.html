@@ -217,6 +217,24 @@
 
         }
 
+        function timeConverter(UNIX_timestamp) {
+            let data = new Date(UNIX_timestamp * 1000);
+            let months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            let year = data.getFullYear();
+            let month = months[data.getMonth()];
+            let date = data.getDate();
+            let hour = data.getHours();
+            let min = data.getMinutes();
+            if (min < 10) {
+                let zero = '0';
+                zero += min;
+                min = zero;;
+            }
+            // let sec = data.getSeconds();
+            let time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min;
+            return time;
+        }
+
         function buildTable() {
 
             let table = document.querySelector("#table-body");
@@ -225,12 +243,15 @@
             let myList = data.querySet;
 
             for (let i in myList) {
+
+                date_time = timeConverter(myList[i][1]);
+
                 //if confirmations < 300 //DOESN'T WORK!!!
                 if (myList[i][3] < 300) {
                     if (myList[i][2] < 0) {
                         var row = `
                 <div class="h-10 alert alert-warning" style="box-shadow: 0 0 5px rgba(0,0,0,0.5);">
-                  <span class="tx_date">NEW ${myList[i][1]}</span>
+                  <span class="tx_date">NEW ${date_time}</span>
                   <span id="tx_ammount" class="tx_ammount_minus">${myList[i][2]}</span>
                   <span id="tx_hash" class="tx_hash"><a href="#" class="hash_link"> ${myList[i][0]
                             }</a></span>
@@ -239,7 +260,7 @@
                     } else {
                         var row = `
                 <div class="h-10 alert alert-warning" style="box-shadow: 0 0 5px rgba(0,0,0,0.5);">
-                  <span class="tx_date">NEW ${myList[i][1]}</span>
+                  <span class="tx_date">NEW ${date_time}</span>
                   <span id="tx_ammount" class="tx_ammount">+${myList[i][2]}</span>
                   <span id="tx_hash" class="tx_hash"><a href="#" class="hash_link"> ${myList[i][0]
                             }</a></span>
@@ -251,7 +272,7 @@
                     //if minus
                     var row = `
                 <div class="alert alert-light" style="box-shadow: 0 0 5px rgba(0,0,0,0.5);">
-                  <span class="tx_date">${myList[i][1]}</span>
+                  <span class="tx_date">${date_time}</span>
                   <span id="tx_ammount" class="tx_ammount_minus">${myList[i][2]}</span>
                   <span id="tx_hash" class="tx_hash"><a href="#" class="hash_link"> ${myList[i][0]
                         }</a></span>
@@ -261,7 +282,7 @@
                     //standart style
                     var row = `
                 <div class="alert alert-light" style="box-shadow: 0 0 5px rgba(0,0,0,0.5);">
-                  <span class="tx_date">${myList[i][1]}</span>
+                  <span class="tx_date">${date_time}</span>
                   <span id="tx_ammount" class="tx_ammount">+${myList[i][2]}</span>
                   <span id="tx_hash" class="tx_hash"><a href="#" class="hash_link"> ${myList[i][0]
                         }</a></span>
