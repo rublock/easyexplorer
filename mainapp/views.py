@@ -19,25 +19,16 @@ class AddressView(View):
         blockchair_API = requests.get("https://api.blockchair.com/bitcoin/stats")
         blockchair_data = json.loads(blockchair_API.content)
 
-        error = False
-
         try:
-            """
-            https://blockchain.info/rawaddr/$bitcoin_address
-            Address can be base58 or hash160
-            Optional limit parameter to show n transactions e.g. &limit=50 (Default: 50, Max: 50)
-            Optional offset parameter to skip the first n transactions e.g. &offset=100 (Page 2 for limit 50)
-            """
             get_api_data = requests.get(
                 f"https://blockchain.info/rawaddr/{user_search}?limit=9999"
             )
+            get_api_data.raise_for_status()
             get_content = get_api_data._content
             single_address_data = json.loads(get_content)
-        except (AssertionError, IndexError):
-            error = True
-
-        if error == True:
-            return render(request, "mainapp/base_error.html")
+        except requests.exceptions.HTTPError as err:
+            if get_api_data.status_code == 404:
+                return render(request, "mainapp/base_error.html")
         else:
             qr = qrcode.QRCode(
                 box_size=10,
