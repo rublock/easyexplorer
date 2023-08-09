@@ -144,6 +144,21 @@
         );
     }
 
+    let data = '{{ tx_data_json|safe }}'
+    let jsonData = JSON.parse(data)
+    let arr = []
+    let count = 0
+    let pagePressed = 1;
+
+    for (let i = 0; i < Object.keys(jsonData).length; i++) {
+        let dict = {}
+        dict[0] = jsonData[i]['hash']
+        dict[1] = jsonData[i]['time']
+        dict[2] = jsonData[i]['result'] / 100000000
+        arr.push(dict)
+        count += 1
+    }
+
     function showTx(arr) {
 
         let state = {
@@ -177,8 +192,8 @@
             wrapper.innerHTML = ``;
             wrapper_down.innerHTML = ``;
 
-            let maxLeft = state.page - Math.floor(state.window / 2);
-            let maxRight = state.page + Math.floor(state.window / 2);
+            let maxLeft = pagePressed - Math.floor(state.window / 2);
+            let maxRight = pagePressed + Math.floor(state.window / 2);
 
             if (maxLeft < 1) {
                 maxLeft = 1;
@@ -195,8 +210,17 @@
             }
 
             for (let page = maxLeft; page <= maxRight; page++) {
-                wrapper.innerHTML += `<button value=${page} class="page page-link" style="border-radius: 0px; border: 0; color: #000000">${page}</button>`;
-                wrapper_down.innerHTML += `<button value=${page} class="page page-link" style="border-radius: 0px; border: 0; color: #000000" onclick="window.scroll(0,0);">${page}</button>`;
+                if (page === pagePressed) {
+                    wrapper.innerHTML += `<button value=${page} class="page page-link" 
+                    style="font-weight: bold; border-radius: 0px; border: 0; color: #F7931A">${page}</button>`;
+                    wrapper_down.innerHTML += `<button value=${page} class="page page-link" 
+                    style="font-weight: bold; border-radius: 0px; border: 0; color: #F7931A" onclick="window.scroll(0,0);">${page}</button>`;
+                } else {
+                    wrapper.innerHTML += `<button value=${page} class="page page-link" 
+                    style="border-radius: 0px; border: 0; color: #000000">${page}</button>`;
+                    wrapper_down.innerHTML += `<button value=${page} class="page page-link" 
+                    style="border-radius: 0px; border: 0; color: #000000" onclick="window.scroll(0,0);">${page}</button>`;
+                }
             }
 
             wrapper.innerHTML =
@@ -209,11 +233,12 @@
             wrapper.innerHTML += `<button value=${pages} class="page page-link" style="border-radius: 0 4px 4px 0; border: 0; color: #000000">&#187;</button>`;
             wrapper_down.innerHTML += `<button value=${pages} class="page page-link" style="border-radius: 0 4px 4px 0; border: 0; color: #000000" onclick="window.scroll(0,0);">&#187;</button>`;
 
-            $(".page").on("click", function () {
-                $("#table-body").empty();
-                state.page = Number($(this).val());
-                buildTable();
-            });
+            document.querySelectorAll(".page").forEach(e => e.addEventListener("click", function () {
+            document.querySelector("#table-body").innerHTML = ``;
+            state.page = Number(this.value);
+            pagePressed = Number(this.value);
+            buildTable();
+        }))
 
         }
 
@@ -297,21 +322,7 @@
         }
     }
 
-    let data = '{{ tx_data_json|safe }}' //data from django
-    let jsonData = JSON.parse(data)
-    let arr = []
-    let count = 0
-
-    for (let i = 0; i < Object.keys(jsonData).length; i++) {
-        let dict = {}
-        dict[0] = jsonData[i]['hash']
-        dict[1] = jsonData[i]['time']
-        dict[2] = jsonData[i]['result'] / 100000000
-        arr.push(dict)
-        count += 1
-    }
-
-    showTx(arr) //let's start the show -_-
+    showTx(arr)
 
 </script>
 
