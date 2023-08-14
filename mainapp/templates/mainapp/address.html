@@ -144,25 +144,15 @@
         );
     }
 
-    let data = '{{ tx_data_json|safe }}'
-    let jsonData = JSON.parse(data)
-    let arr = []
+    let apiData = '{{ api_data|safe }}'
+    let jsonData = JSON.parse(apiData)
     let count = 0
     let pagePressed = 1;
 
-    for (let i = 0; i < Object.keys(jsonData).length; i++) {
-        let dict = {}
-        dict[0] = jsonData[i]['hash']
-        dict[1] = jsonData[i]['time']
-        dict[2] = jsonData[i]['result'] / 100000000
-        arr.push(dict)
-        count += 1
-    }
-
-    function showTx(arr) {
+    function showTx(jsonData) {
 
         let state = {
-            querySet: arr,
+            querySet: jsonData,
 
             page: 1,
             rows: 10,
@@ -322,7 +312,7 @@
         }
     }
 
-    showTx(arr)
+    showTx(jsonData)
 
 </script>
 

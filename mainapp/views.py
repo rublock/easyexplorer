@@ -39,10 +39,19 @@ class AddressView(View):
             img.save("static/img/qr.png")
 
             address = single_address_data["address"]
-            n_tx = single_address_data["n_tx"]
             balance = single_address_data["final_balance"] / 100000000
 
-            tx_data_json = json.dumps(single_address_data["txs"])
+            api_data = []
+
+            for i in range(len(single_address_data['txs'])):
+                dict = {}
+                dict[0] = single_address_data['txs'][i]['hash']
+                dict[1] = single_address_data['txs'][i]['time']
+                dict[2] = single_address_data['txs'][i]['result'] / 100000000
+                api_data.append(dict)
+
+            n_tx = len(api_data)
+            api_data = json.dumps(api_data)
 
             return render(
                 request,
@@ -51,7 +60,7 @@ class AddressView(View):
                     "address": address,
                     "balance": balance,
                     "n_tx": n_tx,
-                    "tx_data_json": tx_data_json,
+                    "api_data": api_data,
                     "blockchair_data": blockchair_data,
                 },
             )
