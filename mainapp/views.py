@@ -20,47 +20,80 @@ class AddressView(View):
         blockchair_data = json.loads(blockchair_API.content)
 
         try:
-            get_api_data = requests.get(
-                f"https://blockchain.info/rawaddr/{user_search}?limit=9999"
-            )
-            get_api_data.raise_for_status()
-            get_content = get_api_data._content
-            single_address_data = json.loads(get_content)
-        except requests.exceptions.HTTPError as err:
-            if get_api_data.status_code == 404:
+            get_api_data = requests.get(f"https://blockchain.info/rawaddr/{user_search}?limit=9999")
+
+            if get_api_data.status_code == 200:
+
+                get_api_data.raise_for_status()
+                get_content = get_api_data._content
+                single_address_data = json.loads(get_content)
+
+                qr = qrcode.QRCode(
+                    box_size=10,
+                    border=6,
+                )
+                qr.add_data(single_address_data["address"])
+                img = qr.make_image(fill_color="#F7931A", back_color="white")
+                img.save("static/img/qr.png")
+
+                address = single_address_data["address"]
+                balance = single_address_data["final_balance"] / 100000000
+
+                api_data = []
+
+                for i in range(len(single_address_data['txs'])):
+                    dict = {}
+                    dict[0] = single_address_data['txs'][i]['hash']
+                    dict[1] = single_address_data['txs'][i]['time']
+                    dict[2] = single_address_data['txs'][i]['result'] / 100000000
+                    api_data.append(dict)
+
+                n_tx = len(api_data)
+                api_data = json.dumps(api_data)
+
+            else:
                 return render(request, "mainapp/base_error.html")
-        else:
-            qr = qrcode.QRCode(
-                box_size=10,
-                border=6,
-            )
-            qr.add_data(single_address_data["address"])
-            img = qr.make_image(fill_color="#F7931A", back_color="white")
-            img.save("static/img/qr.png")
 
-            address = single_address_data["address"]
-            balance = single_address_data["final_balance"] / 100000000
+        except Exception as e:
 
-            api_data = []
+            try:
+                address_data = requests.get(f"https://bitcoinexplorer.org/api/address/{user_search}?limit=9999")
 
-            for i in range(len(single_address_data['txs'])):
-                dict = {}
-                dict[0] = single_address_data['txs'][i]['hash']
-                dict[1] = single_address_data['txs'][i]['time']
-                dict[2] = single_address_data['txs'][i]['result'] / 100000000
-                api_data.append(dict)
+                status = json.loads(address_data.text)
 
-            n_tx = len(api_data)
-            api_data = json.dumps(api_data)
+                if 'txHistory' in status:
+                    get_content = address_data.text
+                    address_data_json = json.loads(get_content)
 
-            return render(
-                request,
-                "mainapp/address.html",
-                {
-                    "address": address,
-                    "balance": balance,
-                    "n_tx": n_tx,
-                    "api_data": api_data,
-                    "blockchair_data": blockchair_data,
-                },
-            )
+                    qr = qrcode.QRCode(
+                        box_size=10,
+                        border=6,
+                    )
+                    qr.add_data(address_data_json["validateaddress"]["address"])
+                    img = qr.make_image(fill_color="#F7931A", back_color="white")
+                    img.save("static/img/qr.png")
+
+                    address = address_data_json["validateaddress"]["address"]
+                    balance = address_data_json["txHistory"]["balanceSat"] / 100000000
+                    n_tx = address_data_json['txHistory']['txCount']
+
+                    api_data = json.dumps(address_data_json["txHistory"])
+                else:
+                    return render(request, "mainapp/base_error.html")
+
+                    
+            except Exception as e:
+                print(f'server error {str(e)}')
+
+
+        return render(
+            request,
+            "mainapp/address.html",
+            {
+                "address": address,
+                "balance": balance,
+                "n_tx": n_tx,
+                "api_data": api_data,
+                "blockchair_data": blockchair_data,
+            },
+        )
