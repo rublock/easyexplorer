@@ -57,7 +57,7 @@ class AddressView(View):
         except Exception as e:
 
             try:
-                address_data = requests.get(f"https://bitcoinexplorer.org/api/address/{user_search}?limit=9999")
+                address_data = requests.get(f"http://127.0.0.1:3002/api/address/{user_search}?limit=9999")
 
                 status = json.loads(address_data.text)
 
