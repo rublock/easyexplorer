@@ -156,7 +156,7 @@
     let count = 0
     let pagePressed = 1;
 
-    let coreApi = false;
+    let coreApi = true;
 
     if (coreApi) {
 
@@ -210,7 +210,7 @@
         }
 
         async function fetchUrlInLoop(i) {
-            const url = `https://bitcoinexplorer.org/api/tx/${txIdsSliced[i]}`;
+            const url = `http://127.0.0.1:3002/api/tx/${txIdsSliced[i]}`;
             return await fetch(url).then((res) => res.json());
         }
 

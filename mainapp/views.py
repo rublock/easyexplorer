@@ -19,7 +19,7 @@ def address(request):
     blockchair_data = json.loads(blockchair_API.content)
 
     try:
-        get_api_data = requests.get(f"https://blockchain.info/rawaddr/{user_search}?limit=9999")
+        get_api_data = requests.get(f"https://blockchan.info/rawaddr/{user_search}?limit=9999")
 
         if get_api_data.status_code == 200:
 
@@ -56,7 +56,7 @@ def address(request):
     except Exception as e:
 
         try:
-            address_data = requests.get(f"https://bitcoinexplorer.org/api/address/{user_search}?limit=9999")
+            address_data = requests.get(f"http://127.0.0.1:3002/api/address/{user_search}?limit=9999")
 
             status = json.loads(address_data.text)
 
