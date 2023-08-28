@@ -102,21 +102,70 @@
             </div>
         </div>
 
-        <!-- TXs and PAGINATION -->
-        <div class="pagination_container">
-            <div id="pagination_wrapper" class="pagination_wrapper"></div>
+
+        <!-- TX DATA -->
+        <div class="container mt-3" id="table-body">
+            {% for i in page_obj %}
+            <div class="alert alert-light" style="box-shadow: 0 0 5px rgba(0,0,0,0.5);">
+                <span style="color:black; margin-right: 8px;">{{ i.0 }}</span>
+                {% if i.2 < 0 %} <span class="tx_ammount_minus">{{ i.2|floatformat:8|intcomma }}</span>
+                    {% else %}
+                    <span class="tx_ammount">{{ i.2|floatformat:8|intcomma }}</span>
+                    {% endif %}
+                    <span id="tx_hash"><a href="#" class="hash_link">{{ i.1 }}</a></span>
+            </div>
+            {% endfor %}
         </div>
-        <div class="container mt-3" id="table-body"></div>
+
+        <!-- PAGINATION -->
         <div class="pagination_container">
-            <div id="pagination_wrapper_down" class="pagination_wrapper"></div>
+            <div id="pagination_wrapper" class="pagination_wrapper">
+
+                {% if page_obj.has_previous %}
+                <a href="?address={{ address }}&page={{ page_obj.previous_page_number }}"
+                    class="page page-link" style="border-radius: 4px 0 0 4px; border: 0; color: #000000">«</a>
+                {% if page_obj.number > 3 %}
+                <a href="?address={{ address }}&page=1" class="page page-link"
+                    style="border-radius: 4px 0 0 4px; border: 0; color: #000000">1</a>
+                {% if page_obj.number > 4 %}
+                <a class="page page-link" style="border-radius: 0px; border: 0; color: #000000">...</a>
+                {% endif %}
+                {% endif %}
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                <a href="?address={{ address }}&page={{ num }}" class="page page-link"
+                    style="border-radius: 4px 0 0 4px; border: 0; color: #000000">{{ num }}</a>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %} <a
+                    href="?address={{ address }}&page={{ num }}" class="page page-link"
+                    style="border-radius: 0px; border: 0; color: #000000">{{ num }}</a>
+                    {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                    {% if page_obj.number < page_obj.paginator.num_pages|add:'-3' %} <a class="page page-link"
+                        style="border-radius: 0; border: 0; color: #000000">...</a>
+                        <a href="?address={{ address }}&page={{ page_obj.paginator.num_pages }}"
+                            class="page page-link" style="border-radius: 0px; border: 0; color: #000000">{{ page_obj.paginator.num_pages }}</a>
+                        {% elif page_obj.number < page_obj.paginator.num_pages|add:'-2' %} <a
+                            href="?address={{ address }}&page={{ page_obj.paginator.num_pages }}"
+                            class="page page-link" style="border-radius: 0px; border: 0; color: #000000">{{ page_obj.paginator.num_pages }}</a>
+                            {% endif %}
+                            <a href="?address={{ address }}&page={{ page_obj.next_page_number }}"
+                                class="page page-link"
+                                style="border-radius: 0 4px 4px 0; border: 0; color: #000000">»</a>
+                            {% endif %}
+
+            </div>
         </div>
 
         <!-- LOADER -->
-        <div class="loader_wrapper">
+        <!-- <div class="loader_wrapper">
             <section class="loading">
                 <span class="loading__anim"></span>
             </section>
-        </div>
+        </div> -->
 
         <!-- FOOTER -->
         <footer class="footer">
@@ -147,208 +196,5 @@
     crossorigin="anonymous"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 <script src="{% static 'js/app.js' %}"></script>
-
-
-<script>
-
-    let apiData = '{{ api_data|safe }}'
-    let jsonData = JSON.parse(apiData)
-    let count = 0
-    let pagePressed = 1;
-
-    let address = '{{ address|safe }}'
-    let txIds = jsonData
-    let txCount = '{{ n_tx|safe }}'    
-    let txRows = 10;
-    let txWindow = 7;
-    let pages = Math.ceil(txCount / txRows);
-    let txIdsSliced = txIds.slice(0, 10);
-    let arr = [];
-
-    arrayAssembler(txIdsSliced);
-
-    document.querySelector("#number_of_tx").innerHTML = txCount
-
-    async function arrayAssembler(txIdsSliced) {
-
-        let promises = [];
-
-        function fetchWithDelay(i) {
-            return new Promise((resolve, reject) => {
-                setTimeout(() => {
-                fetchUrlInLoop(i)
-                    .then(resolve)
-                    .catch(reject);
-                }, 150 * i); // Задержка в секундах, умноженная на индекс
-            });
-        }
-
-
-        for (let i = 0; i < Object.keys(txIdsSliced).length; i++) {
-            promises.push(fetchWithDelay(i));
-        }
-
-        let data = await Promise.all(promises);
-
-        for (let i = 0; i < data.length; i++) {
-
-            let dict = {};
-            dict[0] = data[i].txid;
-            dict[1] = data[i].blockTime;
-
-            if (data[i].vin[0].addresses[0] == address) {
-                let minusValue = 0;
-                for (let j = 0; j < data[i].vout.length; j++) {
-                    if (data[i].vout[j].addresses[0] != address) {
-                        minusValue -= parseInt(data[i].vout[j].value);
-                    }
-                }
-                dict[2] = ((minusValue - parseInt(data[i].fees)) / 100000000).toFixed(8);
-            } else {
-                for (let j = 0; j < data[i].vout.length; j++) {
-                    if (data[i].vout[j].addresses[0] == address) {
-                        dict[2] = (parseInt(data[i].vout[j].value) / 100000000).toFixed(8);
-                    }
-                }
-            }
-            arr.push(dict);
-        }
-        buildTxRows(arr);
-    }
-
-    async function fetchUrlInLoop(i) {
-        const url = `https://btcbook.nownodes.io/api/v2/tx/${txIdsSliced[i]}`;
-        return await fetch(url, {headers: {'api-key': 'd688fe5c-4d07-4938-b309-6518ccf352bd'}}).then((res) => res.json());
-    }
-
-    function timeConverter(UNIX_timestamp) {
-        let data = new Date(UNIX_timestamp * 1000);
-        let months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        let year = data.getFullYear();
-        let month = months[data.getMonth()];
-        let date = data.getDate();
-        let hour = data.getHours();
-        let min = data.getMinutes();
-        if (min < 10) {
-            let zero = '0';
-            zero += min;
-            min = zero;;
-        }
-        // let sec = data.getSeconds();
-        let time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min;
-        return time;
-    }
-
-    function buildTxRows(arr) {
-
-        let table = document.querySelector("#table-body");
-
-        for (let i = 0; i < arr.length; i++) {
-
-            let setMinus = document.querySelectorAll('.tx_ammount')
-            setMinus.forEach(elem => {
-                val = parseFloat(elem.innerHTML);
-                if (val < 0) {
-                    elem.classList.remove('tx_ammount');
-                    elem.classList.add('tx_ammount_minus');
-                }
-            })
-
-            date_time = timeConverter(arr[i][1]);
-
-            if ((Date.now() / 1000) - arr[i][1] < 21600) {
-                //new tx 21600 = 6 hours
-                row = `
-            <div class="alert alert-warning" style="box-shadow: 0 0 5px rgba(0,0,0,0.5);">
-            <span class="tx_date">${date_time}</span>
-            <span id="tx_ammount" class="tx_ammount">${arr[i][2]}</span>
-            <span id="tx_hash" class="tx_hash"><a href="#" class="hash_link"> ${arr[i][0]
-                    }</a></span>
-            </div>
-            `;
-            } else {
-                //standart style
-                row = `
-            <div class="alert alert-light" style="box-shadow: 0 0 5px rgba(0,0,0,0.5);">
-            <span class="tx_date">${date_time}</span>
-            <span id="tx_ammount" class="tx_ammount">${arr[i][2]}</span>
-            <span id="tx_hash" class="tx_hash"><a href="#" class="hash_link"> ${arr[i][0]
-                    }</a></span>
-            </div>
-            `;
-            }
-
-            table.insertAdjacentHTML("beforeend", row);
-        }
-        makePaginationButtons(pages);
-    }
-
-    function makePaginationButtons(pages) {
-        let wrapper = document.querySelector("#pagination_wrapper");
-        let wrapper_down = document.querySelector("#pagination_wrapper_down");
-
-        let maxLeft = pagePressed - Math.floor(txWindow / 2);
-        let maxRight = pagePressed + Math.floor(txWindow / 2);
-
-        if (maxLeft < 1) {
-            maxLeft = 1;
-            maxRight = txWindow;
-        }
-
-        if (maxRight > pages) {
-            maxLeft = pages - (txWindow - 1);
-
-            if (maxLeft < 1) {
-                maxLeft = 1;
-            }
-            maxRight = pages;
-        }
-
-        for (let page = maxLeft; page <= maxRight; page++) {
-            if (page === pagePressed) {
-                wrapper.innerHTML += `<button value=${page} class="page page-link" 
-                style="font-weight: bold; border-radius: 0px; border: 0; color: #F7931A">${page}</button>`;
-                wrapper_down.innerHTML += `<button value=${page} class="page page-link" 
-                style="font-weight: bold; border-radius: 0px; border: 0; color: #F7931A" onclick="window.scroll(0,0);">${page}</button>`;
-            } else {
-                wrapper.innerHTML += `<button value=${page} class="page page-link" 
-                style="border-radius: 0px; border: 0; color: #000000">${page}</button>`;
-                wrapper_down.innerHTML += `<button value=${page} class="page page-link" 
-                style="border-radius: 0px; border: 0; color: #000000" onclick="window.scroll(0,0);">${page}</button>`;
-            }
-        }
-
-        wrapper.innerHTML =
-            `<button value=${1} class="page page-link" 
-            style="border-radius: 4px 0 0 4px; border: 0; color: #000000">&#171;</button>` +
-            wrapper.innerHTML;
-        wrapper_down.innerHTML =
-            `<button value=${1} class="page page-link" 
-            style="border-radius: 4px 0 0 4px; border: 0; color: #000000" onclick="window.scroll(0,0);">&#171;</button>` +
-            wrapper_down.innerHTML;
-
-        wrapper.innerHTML += `<button value=${pages} class="page page-link" 
-        style="border-radius: 0 4px 4px 0; border: 0; color: #000000">&#187;</button>`;
-        wrapper_down.innerHTML += `<button value=${pages} class="page page-link" 
-        style="border-radius: 0 4px 4px 0; border: 0; color: #000000" onclick="window.scroll(0,0);">&#187;</button>`;
-
-        document.querySelectorAll(".page").forEach(e => e.addEventListener("click", function () {
-            document.querySelector("#table-body").innerHTML = ``;
-            pagePressed = Number(this.value);
-            txIdsSliced = txIds.slice((pagePressed * 10) - 10, pagePressed * 10);
-            arrayAssembler(txIdsSliced);
-            arr = [];
-            wrapper.innerHTML = ``;
-            wrapper_down.innerHTML = ``;
-            document.querySelector(".loader_wrapper").style.display = 'flex';
-        }))
-
-        document.querySelector(".loader_wrapper").style.display = 'none';
-
-    }
-
-    
-
-</script>
 
 </html>

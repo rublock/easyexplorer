@@ -1,10 +1,8 @@
-from blockcypher import get_address_details
 from django.shortcuts import render
-from django.views.generic import TemplateView
 import qrcode
-from django.views import View
 import requests
 import json
+from django.core.paginator import Paginator
 
 
 def home(request):
@@ -45,7 +43,41 @@ def address(request):
             address = address_data["address"]
             balance = int(address_data["balance"]) / 100000000
             n_tx = address_data['txs']
-            api_data = json.dumps(address_data["txids"])
+            api_data_temp = address_data["txids"]
+            api_data = []
+
+            for i in api_data_temp:
+                api_key = "d688fe5c-4d07-4938-b309-6518ccf352bd"
+                url = f"https://btcbook.nownodes.io/api/v2/tx/{i}"
+                headers = {"api-key": api_key}
+                response = requests.get(url, headers=headers)
+                if response.status_code == 200:
+                    data = response.json()
+
+
+                    arr_temp = []
+                    
+                    arr_temp.append(data['blockTime'])
+                    arr_temp.append(data['txid'])
+
+                    if data['vin'][0]['addresses'][0] == address:
+                        minusValue = 0
+                        for j in range(len(data['vout'])):
+                            if data['vout'][j]['addresses'][0] != address:
+                                minusValue -= int(data['vout'][j]['value'])
+                        arr_temp.append(round((minusValue - int(data['fees'])) / 100000000, 8))
+                    else:
+                        for j in range(len(data['vout'])):
+                            if data['vout'][j]['addresses'][0] == address:
+                                arr_temp.append(round(int(data['vout'][j]['value']) / 100000000, 8))
+                    api_data.append(arr_temp)
+
+                else:
+                    print("Произошла ошибка при выполнении запроса.")
+
+            paginator = Paginator(api_data, 10)
+            page_number = request.GET.get('page')
+            page_obj = paginator.get_page(page_number)
 
         else:
             return render(request, "mainapp/base_error.html")
@@ -63,5 +95,6 @@ def address(request):
             "n_tx": n_tx,
             "api_data": api_data,
             "blockchair_data": blockchair_data,
+            "page_obj": page_obj,
         },
     )
