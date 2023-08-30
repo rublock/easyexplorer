@@ -87,14 +87,14 @@
                                 <span class="btcBalance" style="color: green; font-weight: bold; 
                                     margin-left: 4px; cursor: pointer;">{{ balance }} ₿</span>
                                 <span class="usdBalance hide" style="color: green; font-weight: bold; margin-left: 4px; cursor: 
-                                    pointer;">{{ balance|mul:blockchair_data.data.market_price_usd|floatformat:2 }}
+                                    pointer;">{{ balance|mul:market_price_usd|floatformat:2 }}
                                     $</span>
                             </a>
                         </div>
                         <div class="transactionsBlock">
                             <div>
                                 <span style="color:black">transactions
-                                    <b id="number_of_tx">{{ n_tx }}</b></span>
+                                    <b id="number_of_tx">{{ txs }}</b></span>
                             </div>
                         </div>
                     </div>
@@ -107,12 +107,12 @@
         <div class="container mt-3" id="table-body">
             {% for i in page_obj %}
             <div class="alert alert-light" style="box-shadow: 0 0 5px rgba(0,0,0,0.5);">
-                <span style="color:black; margin-right: 8px;">{{ i.0 }}</span>
+                <span style="color:black; margin-right: 8px;">{{ i.1 }}</span>
                 {% if i.2 < 0 %} <span class="tx_ammount_minus">{{ i.2|floatformat:8|intcomma }}</span>
                     {% else %}
                     <span class="tx_ammount">{{ i.2|floatformat:8|intcomma }}</span>
                     {% endif %}
-                    <span id="tx_hash"><a href="#" class="hash_link">{{ i.1 }}</a></span>
+                    <span id="tx_hash"><a href="#" class="hash_link">{{ i.0 }}</a></span>
             </div>
             {% endfor %}
         </div>
@@ -122,28 +122,28 @@
             <div id="pagination_wrapper" class="pagination_wrapper">
 
                 {% if page_obj.has_previous %}
-                <a href="?address={{ address }}&page={{ page_obj.previous_page_number }}"
-                    class="page page-link" style="border-radius: 4px 0 0 4px; border: 0; color: #000000">«</a>
-                {% if page_obj.number > 3 %}
-                <a href="?address={{ address }}&page=1" class="page page-link"
-                    style="border-radius: 4px 0 0 4px; border: 0; color: #000000">1</a>
-                {% if page_obj.number > 4 %}
-                <a class="page page-link" style="border-radius: 0px; border: 0; color: #000000">...</a>
-                {% endif %}
-                {% endif %}
+                    <a href="?address={{ address }}&page={{ page_obj.previous_page_number }}"
+                        class="page page-link" style="border-radius: 4px 0 0 4px; border: 0; color: #000000">«</a>
+                        {% if page_obj.number > 3 %}
+                            <a href="?address={{ address }}&page=1" class="page page-link"
+                                style="border-radius: 4px 0 0 4px; border: 0; color: #000000">1</a>
+                                {% if page_obj.number > 4 %}
+                                    <a class="page page-link" style="border-radius: 0px; border: 0; color: #000000">...</a>
+                                {% endif %}
+                        {% endif %}
                 {% endif %}
 
                 {% for num in page_obj.paginator.page_range %}
-                {% if page_obj.number == num %}
-                <a href="?address={{ address }}&page={{ num }}" class="page page-link"
-                    style="border-radius: 4px 0 0 4px; border: 0; color: #000000">{{ num }}</a>
-                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %} <a
-                    href="?address={{ address }}&page={{ num }}" class="page page-link"
-                    style="border-radius: 0px; border: 0; color: #000000">{{ num }}</a>
+                    {% if page_obj.number == num %}
+                        <a href="?address={{ address }}&page={{ num }}" class="page page-link"
+                            style="border-radius: 4px 0 0 4px; border: 0; color: #000000">{{ num }}</a>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %} 
+                                <a href="?address={{ address }}&page={{ num }}" class="page page-link"
+                                style="border-radius: 0px; border: 0; color: #000000">{{ num }}</a>
                     {% endif %}
-                    {% endfor %}
+                {% endfor %}
 
-                    {% if page_obj.has_next %}
+                {% if page_obj.has_next %}
                     {% if page_obj.number < page_obj.paginator.num_pages|add:'-3' %} <a class="page page-link"
                         style="border-radius: 0; border: 0; color: #000000">...</a>
                         <a href="?address={{ address }}&page={{ page_obj.paginator.num_pages }}"
@@ -151,11 +151,11 @@
                         {% elif page_obj.number < page_obj.paginator.num_pages|add:'-2' %} <a
                             href="?address={{ address }}&page={{ page_obj.paginator.num_pages }}"
                             class="page page-link" style="border-radius: 0px; border: 0; color: #000000">{{ page_obj.paginator.num_pages }}</a>
-                            {% endif %}
-                            <a href="?address={{ address }}&page={{ page_obj.next_page_number }}"
-                                class="page page-link"
-                                style="border-radius: 0 4px 4px 0; border: 0; color: #000000">»</a>
-                            {% endif %}
+                    {% endif %}
+                    <a href="?address={{ address }}&page={{ page_obj.next_page_number }}"
+                        class="page page-link"
+                        style="border-radius: 0 4px 4px 0; border: 0; color: #000000">»</a>
+                {% endif %}
 
             </div>
         </div>
@@ -194,7 +194,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
     crossorigin="anonymous"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script> -->
 <script src="{% static 'js/app.js' %}"></script>
 
 </html>

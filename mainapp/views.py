@@ -15,6 +15,7 @@ def address(request):
 
     blockchair_API = requests.get("https://api.blockchair.com/bitcoin/stats")
     blockchair_data = json.loads(blockchair_API.content)
+    market_price_usd = blockchair_data['data']['market_price_usd']
 
     try:
 
@@ -24,60 +25,73 @@ def address(request):
             "api-key": "d688fe5c-4d07-4938-b309-6518ccf352bd",
         }
 
-        get_api_data = requests.get(url, headers=headers)
+        nownodes_getaddress = requests.get(url, headers=headers)
 
-        if get_api_data.status_code == 200:
+        if nownodes_getaddress.status_code == 200:
 
-            get_api_data.raise_for_status()
-            get_content = get_api_data._content
-            address_data = json.loads(get_content)
+            nownodes_getaddress.raise_for_status()
+            nownodes_getaddress_content = nownodes_getaddress._content
+            nownodes_getaddress_json = json.loads(nownodes_getaddress_content)
 
             qr = qrcode.QRCode(
                 box_size=10,
                 border=6,
             )
-            qr.add_data(address_data["address"])
+            qr.add_data(nownodes_getaddress_json["address"])
             img = qr.make_image(fill_color="#F7931A", back_color="white")
             img.save("static/img/qr.png")
 
-            address = address_data["address"]
-            balance = int(address_data["balance"]) / 100000000
-            n_tx = address_data['txs']
-            api_data_temp = address_data["txids"]
-            api_data = []
+            address = nownodes_getaddress_json["address"]
+            balance = int(nownodes_getaddress_json["balance"]) / 100000000
+            txs = nownodes_getaddress_json['txs']
 
-            for i in api_data_temp:
+            txids = nownodes_getaddress_json["txids"]
+
+            paginator = Paginator(txids, 10)
+            page_number = request.GET.get('page')
+            page_obj = paginator.get_page(page_number)
+
+            for i in range(len(page_obj.object_list)):
+                page_obj.object_list[i] = [page_obj.object_list[i]]
+
+            url = ''
+
+            for i in range(10): #исправить
+
+                if page_number:
+                    slice_two = int(page_number) * 10
+                    slice_one = slice_two - 10
+                    url = f"https://btcbook.nownodes.io/api/v2/tx/{txids[slice_one:slice_two][i]}"
+                else:
+                    url = f"https://btcbook.nownodes.io/api/v2/tx/{txids[0:10][i]}"
+
                 api_key = "d688fe5c-4d07-4938-b309-6518ccf352bd"
-                url = f"https://btcbook.nownodes.io/api/v2/tx/{i}"
-                headers = {"api-key": api_key}
-                response = requests.get(url, headers=headers)
-                if response.status_code == 200:
-                    data = response.json()
 
+                headers = {
+                    "api-key": api_key
+                }
 
-                    arr_temp = []
+                nownodes_gettransaction = requests.get(url, headers=headers)
+
+                if nownodes_gettransaction.status_code == 200:
+                    nownodes_gettransaction_json = nownodes_gettransaction.json()
                     
-                    arr_temp.append(data['blockTime'])
-                    arr_temp.append(data['txid'])
+                    page_obj.object_list[i].append(nownodes_gettransaction_json['blockTime'])
 
-                    if data['vin'][0]['addresses'][0] == address:
+                    if nownodes_gettransaction_json['vin'][0]['addresses'][0] == address:
                         minusValue = 0
-                        for j in range(len(data['vout'])):
-                            if data['vout'][j]['addresses'][0] != address:
-                                minusValue -= int(data['vout'][j]['value'])
-                        arr_temp.append(round((minusValue - int(data['fees'])) / 100000000, 8))
+                        for j in range(len(nownodes_gettransaction_json['vout'])):
+                            if nownodes_gettransaction_json['vout'][j]['addresses'][0] != address:
+                                minusValue -= int(nownodes_gettransaction_json['vout'][j]['value'])
+                        minusValue -= int(nownodes_gettransaction_json['fees'])
+                        page_obj.object_list[i].append(minusValue / 100000000)
                     else:
-                        for j in range(len(data['vout'])):
-                            if data['vout'][j]['addresses'][0] == address:
-                                arr_temp.append(round(int(data['vout'][j]['value']) / 100000000, 8))
-                    api_data.append(arr_temp)
+                        for j in range(len(nownodes_gettransaction_json['vout'])):
+                            if nownodes_gettransaction_json['vout'][j]['addresses'][0] == address:
+                                page_obj.object_list[i].append(round(int(nownodes_gettransaction_json['vout'][j]['value']) / 100000000, 8))
 
                 else:
                     print("Произошла ошибка при выполнении запроса.")
-
-            paginator = Paginator(api_data, 10)
-            page_number = request.GET.get('page')
-            page_obj = paginator.get_page(page_number)
 
         else:
             return render(request, "mainapp/base_error.html")
@@ -85,16 +99,14 @@ def address(request):
     except Exception as e:
         print(f'server error {str(e)}')
 
-
     return render(
         request,
         "mainapp/address.html",
         {
             "address": address,
             "balance": balance,
-            "n_tx": n_tx,
-            "api_data": api_data,
-            "blockchair_data": blockchair_data,
+            "txs": txs,
+            "market_price_usd": market_price_usd,
             "page_obj": page_obj,
         },
     )
