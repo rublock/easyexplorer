@@ -94,6 +94,8 @@ def address(request):
                         for j in range(len(nownodes_gettransaction_json['vout'])):
                             if nownodes_gettransaction_json['vout'][j]['addresses'][0] == address:
                                 page_obj.object_list[i].append(round(int(nownodes_gettransaction_json['vout'][j]['value']) / 100000000, 8))
+                    
+                    page_obj.object_list[i].append(confirmations)
 
                 else:
                     print("Произошла ошибка при выполнении запроса.")

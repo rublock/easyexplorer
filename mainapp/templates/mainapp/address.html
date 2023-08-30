@@ -106,7 +106,7 @@
         <!-- TX DATA -->
         <div class="container mt-3" id="table-body">
             {% for i in page_obj %}
-                {% if confirmations < 8 %}
+                {% if i.3 < 8 %}
                     <div class="alert alert-warning" style="box-shadow: 0 0 5px rgba(0,0,0,0.5);">
                         <span style="color:black; margin-right: 8px;">{{ i.1 }}</span>
                         {% if i.2 < 0 %} <span class="tx_ammount_minus">{{ i.2|floatformat:8|intcomma }}</span>
