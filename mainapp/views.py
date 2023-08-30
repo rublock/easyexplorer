@@ -3,6 +3,7 @@ import qrcode
 import requests
 import json
 from django.core.paginator import Paginator
+from datetime import datetime
 
 
 def home(request):
@@ -75,8 +76,12 @@ def address(request):
 
                 if nownodes_gettransaction.status_code == 200:
                     nownodes_gettransaction_json = nownodes_gettransaction.json()
+
+                    confirmations = nownodes_gettransaction_json['confirmations']
+
+                    date_time_human = datetime.utcfromtimestamp(nownodes_gettransaction_json['blockTime']).strftime('%d.%m.%Y %H:%M')
                     
-                    page_obj.object_list[i].append(nownodes_gettransaction_json['blockTime'])
+                    page_obj.object_list[i].append(date_time_human)
 
                     if nownodes_gettransaction_json['vin'][0]['addresses'][0] == address:
                         minusValue = 0
@@ -108,5 +113,6 @@ def address(request):
             "txs": txs,
             "market_price_usd": market_price_usd,
             "page_obj": page_obj,
+            "confirmations": confirmations,
         },
     )
