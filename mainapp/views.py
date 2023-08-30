@@ -48,8 +48,11 @@ def address(request):
                 balance = balance / 100000000
             else:
                 balance = int(nownodes_getaddress_json["balance"]) / 100000000
-                
+
             txs = nownodes_getaddress_json['txs']
+
+            if nownodes_getaddress_json["unconfirmedTxs"] > 1:
+                txs = nownodes_getaddress_json['txs'] + nownodes_getaddress_json["unconfirmedTxs"]
 
             txids = nownodes_getaddress_json["txids"]
 
