@@ -120,13 +120,20 @@
                         <span style="color:black; margin-right: 8px;">{{ i.1 }}</span>
                         {% if i.2 < 0 %} <span class="tx_ammount_minus">{{ i.2|floatformat:8|intcomma }}</span>
                             {% else %}
-                            <span class="tx_ammount">{{ i.2|floatformat:8|intcomma }}</span>
+                            <span class="tx_ammount">+{{ i.2|floatformat:8|intcomma }}</span>
                         {% endif %}
                             <span id="tx_hash"><a href="#" class="hash_link">{{ i.0 }}</a></span>
                     </div>
                 {% endif %}
             {% endfor %}
         </div>
+
+        <!-- LOADER -->
+        <!-- <div class="loader_wrapper">
+            <section class="loading">
+                <span class="loading__anim"></span>
+            </section>
+        </div> -->
 
         <!-- PAGINATION -->
         <div class="pagination_container">
@@ -143,7 +150,7 @@
                                 {% endif %}
                         {% endif %}
                 {% endif %}
-
+        
                 {% for num in page_obj.paginator.page_range %}
                     {% if page_obj.number == num %}
                         <a href="?address={{ address }}&page={{ num }}" class="page page-link"
@@ -171,12 +178,7 @@
             </div>
         </div>
 
-        <!-- LOADER -->
-        <div class="loader_wrapper">
-            <section class="loading">
-                <span class="loading__anim"></span>
-            </section>
-        </div>
+
 
         <!-- FOOTER -->
         <footer class="footer">

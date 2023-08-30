@@ -13,13 +13,6 @@ try {
         }
     })
 } catch {
-    console.log('Welcome to btcblockexplorer.io!')
+    console.log('Welcome to easyExplorer.io!')
 }
 
-//LOAD ANIMATION
-
-document.querySelectorAll(".page").forEach(e => e.addEventListener("click", function () {
-    document.querySelector(".loader_wrapper").style.display = 'flex';
-}))
-
-document.querySelector(".loader_wrapper").style.display = 'none';

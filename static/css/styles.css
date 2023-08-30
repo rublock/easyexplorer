@@ -177,7 +177,7 @@ body::-webkit-scrollbar-thumb {
   }
 
   .loader_wrapper {
-    display: flex;
+    display: none;
     justify-content: center;
     align-items: center;
     margin-bottom: 100px;
