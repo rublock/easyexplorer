@@ -43,7 +43,12 @@ def address(request):
             img.save("static/img/qr.png")
 
             address = nownodes_getaddress_json["address"]
-            balance = int(nownodes_getaddress_json["balance"]) / 100000000
+            if nownodes_getaddress_json["unconfirmedTxs"] > 1:
+                balance = int(nownodes_getaddress_json["balance"]) + int(nownodes_getaddress_json["unconfirmedBalance"])
+                balance = balance / 100000000
+            else:
+                balance = int(nownodes_getaddress_json["balance"]) / 100000000
+                
             txs = nownodes_getaddress_json['txs']
 
             txids = nownodes_getaddress_json["txids"]
