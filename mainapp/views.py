@@ -1,10 +1,8 @@
-from blockcypher import get_address_details
 from django.shortcuts import render
-from django.views.generic import TemplateView
 import qrcode
-from django.views import View
 import requests
 import json
+from django.core.paginator import Paginator
 
 
 def home(request):
@@ -17,73 +15,89 @@ def address(request):
 
     blockchair_API = requests.get("https://api.blockchair.com/bitcoin/stats")
     blockchair_data = json.loads(blockchair_API.content)
+    market_price_usd = blockchair_data['data']['market_price_usd']
 
     try:
-        get_api_data = requests.get(f"https://blockchain.info/rawaddr/{user_search}?limit=9999")
 
-        if get_api_data.status_code == 200:
+        url = f"https://btcbook.nownodes.io/api/v2/address/{user_search}"
 
-            get_api_data.raise_for_status()
-            get_content = get_api_data._content
-            single_address_data = json.loads(get_content)
+        headers = {
+            "api-key": "d688fe5c-4d07-4938-b309-6518ccf352bd",
+        }
+
+        nownodes_getaddress = requests.get(url, headers=headers)
+
+        if nownodes_getaddress.status_code == 200:
+
+            nownodes_getaddress.raise_for_status()
+            nownodes_getaddress_content = nownodes_getaddress._content
+            nownodes_getaddress_json = json.loads(nownodes_getaddress_content)
 
             qr = qrcode.QRCode(
                 box_size=10,
                 border=6,
             )
-            qr.add_data(single_address_data["address"])
+            qr.add_data(nownodes_getaddress_json["address"])
             img = qr.make_image(fill_color="#F7931A", back_color="white")
             img.save("static/img/qr.png")
 
-            address = single_address_data["address"]
-            balance = single_address_data["final_balance"] / 100000000
+            address = nownodes_getaddress_json["address"]
+            balance = int(nownodes_getaddress_json["balance"]) / 100000000
+            txs = nownodes_getaddress_json['txs']
 
-            api_data = []
+            txids = nownodes_getaddress_json["txids"]
 
-            for i in range(len(single_address_data['txs'])):
-                dict = {}
-                dict[0] = single_address_data['txs'][i]['hash']
-                dict[1] = single_address_data['txs'][i]['time']
-                dict[2] = single_address_data['txs'][i]['result'] / 100000000
-                api_data.append(dict)
+            paginator = Paginator(txids, 10)
+            page_number = request.GET.get('page')
+            page_obj = paginator.get_page(page_number)
 
-            n_tx = len(api_data)
-            api_data = json.dumps(api_data)
+            for i in range(len(page_obj.object_list)):
+                page_obj.object_list[i] = [page_obj.object_list[i]]
+
+            url = ''
+
+            for i in range(10): #исправить
+
+                if page_number:
+                    slice_two = int(page_number) * 10
+                    slice_one = slice_two - 10
+                    url = f"https://btcbook.nownodes.io/api/v2/tx/{txids[slice_one:slice_two][i]}"
+                else:
+                    url = f"https://btcbook.nownodes.io/api/v2/tx/{txids[0:10][i]}"
+
+                api_key = "d688fe5c-4d07-4938-b309-6518ccf352bd"
+
+                headers = {
+                    "api-key": api_key
+                }
+
+                nownodes_gettransaction = requests.get(url, headers=headers)
+
+                if nownodes_gettransaction.status_code == 200:
+                    nownodes_gettransaction_json = nownodes_gettransaction.json()
+                    
+                    page_obj.object_list[i].append(nownodes_gettransaction_json['blockTime'])
+
+                    if nownodes_gettransaction_json['vin'][0]['addresses'][0] == address:
+                        minusValue = 0
+                        for j in range(len(nownodes_gettransaction_json['vout'])):
+                            if nownodes_gettransaction_json['vout'][j]['addresses'][0] != address:
+                                minusValue -= int(nownodes_gettransaction_json['vout'][j]['value'])
+                        minusValue -= int(nownodes_gettransaction_json['fees'])
+                        page_obj.object_list[i].append(minusValue / 100000000)
+                    else:
+                        for j in range(len(nownodes_gettransaction_json['vout'])):
+                            if nownodes_gettransaction_json['vout'][j]['addresses'][0] == address:
+                                page_obj.object_list[i].append(round(int(nownodes_gettransaction_json['vout'][j]['value']) / 100000000, 8))
+
+                else:
+                    print("Произошла ошибка при выполнении запроса.")
 
         else:
             return render(request, "mainapp/base_error.html")
 
     except Exception as e:
-
-        try:
-            address_data = requests.get(f"https://bitcoinexplorer.org/api/address/{user_search}?limit=9999")
-
-            status = json.loads(address_data.text)
-
-            if 'txHistory' in status:
-                get_content = address_data.text
-                address_data_json = json.loads(get_content)
-
-                qr = qrcode.QRCode(
-                    box_size=10,
-                    border=6,
-                )
-                qr.add_data(address_data_json["validateaddress"]["address"])
-                img = qr.make_image(fill_color="#F7931A", back_color="white")
-                img.save("static/img/qr.png")
-
-                address = address_data_json["validateaddress"]["address"]
-                balance = address_data_json["txHistory"]["balanceSat"] / 100000000
-                n_tx = address_data_json['txHistory']['txCount']
-
-                api_data = json.dumps(address_data_json["txHistory"])
-            else:
-                return render(request, "mainapp/base_error.html")
-
-                
-        except Exception as e:
-            print(f'server error {str(e)}')
-
+        print(f'server error {str(e)}')
 
     return render(
         request,
@@ -91,8 +105,8 @@ def address(request):
         {
             "address": address,
             "balance": balance,
-            "n_tx": n_tx,
-            "api_data": api_data,
-            "blockchair_data": blockchair_data,
+            "txs": txs,
+            "market_price_usd": market_price_usd,
+            "page_obj": page_obj,
         },
     )
