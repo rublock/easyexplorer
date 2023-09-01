@@ -8,3 +8,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('mainapp.urls')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+handler404 = "mainapp.views.page_404"

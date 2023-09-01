@@ -9,6 +9,8 @@ from datetime import datetime
 def home(request):
     return render(request, "mainapp/base.html")
 
+def page_404(request, exception):
+    return render(request, "mainapp/404.html")
 
 def address(request):
 
@@ -65,7 +67,7 @@ def address(request):
 
             url = ''
 
-            for i in range(10): #исправить
+            for i in range(10):
 
                 if page_number:
                     slice_two = int(page_number) * 10
@@ -109,7 +111,7 @@ def address(request):
                     print("Произошла ошибка при выполнении запроса.")
 
         else:
-            return render(request, "mainapp/base_error.html")
+            return render(request, "mainapp/error.html")
 
     except Exception as e:
         print(f'server error {str(e)}')
