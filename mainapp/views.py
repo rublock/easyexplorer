@@ -70,7 +70,10 @@ def address(request):
             for i in range(10):
 
                 if page_number:
-                    slice_two = int(page_number) * 10
+                    if int(page_number) * 10 > len(txids):
+                        slice_two = len(txids)
+                    else:
+                        slice_two = int(page_number) * 10
                     slice_one = slice_two - 10
                     try:
                         url = f"https://btcbook.nownodes.io/api/v2/tx/{txids[slice_one:slice_two][i]}"
