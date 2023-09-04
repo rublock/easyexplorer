@@ -72,7 +72,10 @@ def address(request):
                 if page_number:
                     slice_two = int(page_number) * 10
                     slice_one = slice_two - 10
-                    url = f"https://btcbook.nownodes.io/api/v2/tx/{txids[slice_one:slice_two][i]}"
+                    try:
+                        url = f"https://btcbook.nownodes.io/api/v2/tx/{txids[slice_one:slice_two][i]}"
+                    except Exception as e:
+                        return render(request, "mainapp/404.html")
                 else:
                     url = f"https://btcbook.nownodes.io/api/v2/tx/{txids[0:10][i]}"
 
