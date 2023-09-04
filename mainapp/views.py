@@ -3,11 +3,14 @@ import qrcode
 import requests
 import json
 from django.core.paginator import Paginator
+from datetime import datetime
 
 
 def home(request):
     return render(request, "mainapp/base.html")
 
+def page_404(request, exception):
+    return render(request, "mainapp/404.html")
 
 def address(request):
 
@@ -42,8 +45,16 @@ def address(request):
             img.save("static/img/qr.png")
 
             address = nownodes_getaddress_json["address"]
-            balance = int(nownodes_getaddress_json["balance"]) / 100000000
+            if nownodes_getaddress_json["unconfirmedTxs"] > 1:
+                balance = int(nownodes_getaddress_json["balance"]) + int(nownodes_getaddress_json["unconfirmedBalance"])
+                balance = balance / 100000000
+            else:
+                balance = int(nownodes_getaddress_json["balance"]) / 100000000
+
             txs = nownodes_getaddress_json['txs']
+
+            if nownodes_getaddress_json["unconfirmedTxs"] > 1:
+                txs = nownodes_getaddress_json['txs'] + nownodes_getaddress_json["unconfirmedTxs"]
 
             txids = nownodes_getaddress_json["txids"]
 
@@ -56,12 +67,18 @@ def address(request):
 
             url = ''
 
-            for i in range(10): #исправить
+            for i in range(10):
 
                 if page_number:
-                    slice_two = int(page_number) * 10
+                    if int(page_number) * 10 > len(txids):
+                        slice_two = len(txids)
+                    else:
+                        slice_two = int(page_number) * 10
                     slice_one = slice_two - 10
-                    url = f"https://btcbook.nownodes.io/api/v2/tx/{txids[slice_one:slice_two][i]}"
+                    try:
+                        url = f"https://btcbook.nownodes.io/api/v2/tx/{txids[slice_one:slice_two][i]}"
+                    except Exception as e:
+                        return render(request, "mainapp/404.html")
                 else:
                     url = f"https://btcbook.nownodes.io/api/v2/tx/{txids[0:10][i]}"
 
@@ -75,8 +92,12 @@ def address(request):
 
                 if nownodes_gettransaction.status_code == 200:
                     nownodes_gettransaction_json = nownodes_gettransaction.json()
+
+                    confirmations = nownodes_gettransaction_json['confirmations']
+
+                    date_time_human = datetime.utcfromtimestamp(nownodes_gettransaction_json['blockTime']).strftime('%d.%m.%Y %H:%M')
                     
-                    page_obj.object_list[i].append(nownodes_gettransaction_json['blockTime'])
+                    page_obj.object_list[i].append(date_time_human)
 
                     if nownodes_gettransaction_json['vin'][0]['addresses'][0] == address:
                         minusValue = 0
@@ -89,12 +110,14 @@ def address(request):
                         for j in range(len(nownodes_gettransaction_json['vout'])):
                             if nownodes_gettransaction_json['vout'][j]['addresses'][0] == address:
                                 page_obj.object_list[i].append(round(int(nownodes_gettransaction_json['vout'][j]['value']) / 100000000, 8))
+                    
+                    page_obj.object_list[i].append(confirmations)
 
                 else:
                     print("Произошла ошибка при выполнении запроса.")
 
         else:
-            return render(request, "mainapp/base_error.html")
+            return render(request, "mainapp/error.html")
 
     except Exception as e:
         print(f'server error {str(e)}')
@@ -108,5 +131,6 @@ def address(request):
             "txs": txs,
             "market_price_usd": market_price_usd,
             "page_obj": page_obj,
+            "confirmations": confirmations,
         },
     )

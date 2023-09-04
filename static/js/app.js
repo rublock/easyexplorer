@@ -13,5 +13,6 @@ try {
         }
     })
 } catch {
-    console.log('Welcome to btcblockexplorer.io!')
+    console.log('Welcome to easyExplorer.io!')
 }
+
